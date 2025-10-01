@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FontForge | Generative Typographic Art</title>
+    <title>GlyphCanvas | Generative Typographic Art</title>
     <style>
         :root {
             --primary-color: #1a1a2e;
@@ -17,6 +17,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
@@ -26,6 +27,7 @@
             line-height: 1.6;
             min-height: 100vh;
             padding: 20px;
+            touch-action: manipulation;
         }
         
         .container {
@@ -40,7 +42,7 @@
         }
         
         h1 {
-            font-size: 3.5rem;
+            font-size: clamp(2rem, 5vw, 3.5rem);
             margin-bottom: 10px;
             font-family: var(--font-sample);
             background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
@@ -53,7 +55,7 @@
         .tagline {
             font-style: italic;
             color: #a3a3c2;
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 3vw, 1.2rem);
         }
         
         .art-container {
@@ -68,17 +70,22 @@
             position: relative;
             width: 100%;
             max-width: 800px;
-            height: 500px;
+            height: 50vh;
+            min-height: 300px;
             border: 3px solid var(--accent-color);
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             background-color: #0a0a18;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
         }
         
         #artCanvas {
             width: 100%;
             height: 100%;
+            display: block;
         }
         
         .typing-interface {
@@ -94,9 +101,11 @@
             border-radius: 8px;
             color: var(--text-color);
             font-family: var(--font-sample);
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 4vw, 1.2rem);
             resize: none;
             transition: all 0.3s ease;
+            -webkit-appearance: none;
+            -webkit-border-radius: 8px;
         }
         
         .type-input:focus {
@@ -107,13 +116,14 @@
         
         .controls {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             margin-top: 15px;
-            gap: 15px;
+            gap: 10px;
         }
         
         button {
-            padding: 10px 20px;
+            padding: 12px 20px;
             background: var(--accent-color);
             color: white;
             border: none;
@@ -122,9 +132,14 @@
             transition: all 0.3s ease;
             font-family: var(--font-sample);
             font-weight: bold;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+            flex: 1;
+            min-width: 120px;
+            -webkit-appearance: none;
+            touch-action: manipulation;
         }
         
-        button:hover {
+        button:hover, button:active {
             background: #1a4a8a;
             transform: translateY(-2px);
         }
@@ -149,6 +164,7 @@
             color: #4ecdc4;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding-bottom: 8px;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
         }
         
         .stats {
@@ -162,12 +178,13 @@
             justify-content: space-between;
             padding: 8px 0;
             border-bottom: 1px dotted rgba(255, 255, 255, 0.1);
+            font-size: clamp(0.9rem, 3vw, 1rem);
         }
         
         .glyph-palette {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
             margin-top: 10px;
         }
         
@@ -184,9 +201,11 @@
             transition: all 0.2s ease;
             font-family: var(--font-sample);
             font-size: 1.2rem;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
         
-        .glyph-option:hover, .glyph-option.active {
+        .glyph-option:hover, .glyph-option.active, .glyph-option:active {
             background: var(--accent-color);
             transform: scale(1.1);
         }
@@ -199,12 +218,24 @@
             margin-bottom: 10px;
             display: flex;
             align-items: flex-start;
+            font-size: clamp(0.9rem, 3vw, 1rem);
         }
         
         .instruction-item:before {
             content: "▸";
             margin-right: 10px;
             color: #4ecdc4;
+        }
+        
+        .mobile-notice {
+            display: none;
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid #ff6b6b;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 0.9rem;
         }
         
         footer {
@@ -226,16 +257,51 @@
         }
         
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
+            body {
+                padding: 15px;
+            }
+            
+            .canvas-wrapper {
+                height: 40vh;
+                min-height: 250px;
             }
             
             .controls {
                 flex-direction: column;
             }
             
-            .canvas-wrapper {
-                height: 400px;
+            button {
+                min-width: auto;
+            }
+            
+            .mobile-notice {
+                display: block;
+            }
+            
+            .glyph-palette {
+                gap: 6px;
+            }
+            
+            .glyph-option {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .info-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .glyph-option {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -243,11 +309,15 @@
 <body>
     <div class="container">
         <header>
-            <h1>FontForge</h1>
+            <h1>GlyphCanvas</h1>
             <p class="tagline">Generative art emerging from your keystrokes</p>
         </header>
         
         <div class="art-container">
+            <div class="mobile-notice" id="mobileNotice">
+                💡 Mobile tip: Make sure your keyboard is open and typing is working
+            </div>
+            
             <div class="canvas-wrapper">
                 <canvas id="artCanvas"></canvas>
             </div>
@@ -307,19 +377,30 @@
         </div>
         
         <footer>
-            <p>FontForge Generative Art &copy; 2023 | Each keystroke creates visual poetry</p>
+            <p>GlyphCanvas Generative Art &copy; 2023 | Each keystroke creates visual poetry</p>
         </footer>
     </div>
 
     <script>
+        // Mobile detection
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
         // Canvas setup
         const canvas = document.getElementById('artCanvas');
         const ctx = canvas.getContext('2d');
         
-        // Set canvas dimensions
+        // Set canvas dimensions with device pixel ratio for crisp rendering
         function resizeCanvas() {
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            
+            ctx.scale(dpr, dpr);
+            canvas.style.width = `${rect.width}px`;
+            canvas.style.height = `${rect.height}px`;
+            
             // Redraw existing content if any
             if (typeof redrawCanvas === 'function') {
                 redrawCanvas();
@@ -327,9 +408,10 @@
         }
         
         window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('orientationchange', resizeCanvas);
         
         // Initial resize
-        resizeCanvas();
+        setTimeout(resizeCanvas, 100);
         
         // Application state
         const state = {
@@ -337,14 +419,22 @@
             renderMode: 'spiral',
             colorPalette: 'deepOcean',
             currentGlyph: 'A',
-            centerX: canvas.width / 2,
-            centerY: canvas.height / 2,
+            centerX: 0,
+            centerY: 0,
             angle: 0,
             radius: 0,
             growthFactor: 0.5,
             colorIndex: 0,
-            particles: []
+            particles: [],
+            isDrawing: false
         };
+        
+        // Update center coordinates after resize
+        function updateCenter() {
+            const rect = canvas.getBoundingClientRect();
+            state.centerX = rect.width / 2;
+            state.centerY = rect.height / 2;
+        }
         
         // Color palettes
         const palettes = {
@@ -375,12 +465,23 @@
                 state.currentGlyph = glyph;
                 document.getElementById('currentGlyph').textContent = glyph;
             });
+            
+            // Add touch event for mobile
+            glyphElement.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.glyph-option').forEach(opt => opt.classList.remove('active'));
+                glyphElement.classList.add('active');
+                state.currentGlyph = glyph;
+                document.getElementById('currentGlyph').textContent = glyph;
+            });
+            
             glyphPalette.appendChild(glyphElement);
         });
         
         // Typing input handler
         const typeInput = document.getElementById('typeInput');
-        typeInput.addEventListener('input', (e) => {
+        
+        function handleInput(e) {
             const newText = e.target.value;
             const newChars = newText.length - state.charactersTyped;
             
@@ -393,10 +494,24 @@
             }
             
             updateStats();
+        }
+        
+        typeInput.addEventListener('input', handleInput);
+        
+        // Force focus on mobile when tapping the textarea
+        typeInput.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            typeInput.focus();
+            
+            // Show virtual keyboard on mobile
+            if (isMobile) {
+                typeInput.setAttribute('style', 'font-size: 16px;'); // Prevents zoom on iOS
+            }
         });
         
         // Add a character to the generative art
         function addCharacterToArt(char) {
+            updateCenter(); // Ensure center coordinates are current
             const colors = palettes[state.colorPalette];
             
             switch(state.renderMode) {
@@ -419,7 +534,8 @@
             state.radius += state.growthFactor;
             
             // Reset radius if it gets too large
-            if (state.radius > Math.min(canvas.width, canvas.height) / 2) {
+            const maxRadius = Math.min(state.centerX, state.centerY) - 20;
+            if (state.radius > maxRadius) {
                 state.radius = 0;
                 state.colorIndex = (state.colorIndex + 1) % colors.length;
             }
@@ -430,10 +546,10 @@
             const x = state.centerX + Math.cos(state.angle) * state.radius;
             const y = state.centerY + Math.sin(state.angle) * state.radius;
             
-            const fontSize = 10 + (state.radius / 10);
+            const fontSize = Math.max(8, 10 + (state.radius / 15));
             const color = colors[state.colorIndex % colors.length];
             
-            ctx.font = `${fontSize}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
+            ctx.font = `bold ${fontSize}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
             ctx.fillStyle = color;
             ctx.fillText(char, x, y);
         }
@@ -442,7 +558,7 @@
         function renderRadial(char, colors) {
             const segmentAngle = (2 * Math.PI) / 20;
             const currentAngle = (state.charactersTyped % 20) * segmentAngle;
-            const radius = 50 + Math.floor(state.charactersTyped / 20) * 15;
+            const radius = 30 + Math.floor(state.charactersTyped / 20) * 12;
             
             const x = state.centerX + Math.cos(currentAngle) * radius;
             const y = state.centerY + Math.sin(currentAngle) * radius;
@@ -450,7 +566,7 @@
             const fontSize = 12;
             const color = colors[state.charactersTyped % colors.length];
             
-            ctx.font = `${fontSize}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
+            ctx.font = `bold ${fontSize}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
             ctx.fillStyle = color;
             ctx.fillText(char, x, y);
         }
@@ -460,47 +576,27 @@
             const particle = {
                 x: state.centerX,
                 y: state.centerY,
-                vx: (Math.random() - 0.5) * 4,
-                vy: (Math.random() - 0.5) * 4,
+                vx: (Math.random() - 0.5) * 3,
+                vy: (Math.random() - 0.5) * 3,
                 char: char,
                 color: colors[Math.floor(Math.random() * colors.length)],
-                size: 10 + Math.random() * 20,
+                size: 12 + Math.random() * 16,
                 life: 1.0
             };
             
             state.particles.push(particle);
-            
-            // Update and draw all particles
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            state.particles.forEach((p, index) => {
-                p.x += p.vx;
-                p.y += p.vy;
-                p.life -= 0.005;
-                
-                if (p.life <= 0) {
-                    state.particles.splice(index, 1);
-                } else {
-                    ctx.font = `${p.size}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
-                    ctx.fillStyle = p.color;
-                    ctx.globalAlpha = p.life;
-                    ctx.fillText(p.char, p.x, p.y);
-                }
-            });
-            
-            ctx.globalAlpha = 1.0;
         }
         
         // Wave rendering mode
         function renderWave(char, colors) {
-            const waveCount = Math.floor(state.charactersTyped / 50) + 1;
-            const y = state.centerY + Math.sin(state.angle * 2) * 50;
-            const x = state.centerX + (state.charactersTyped % 50) * 15 - 375;
+            const waveCount = Math.floor(state.charactersTyped / 30) + 1;
+            const y = state.centerY + Math.sin(state.angle * 2) * 40;
+            const x = state.centerX + (state.charactersTyped % 30) * 20 - 300;
             
             const fontSize = 14;
             const color = colors[waveCount % colors.length];
             
-            ctx.font = `${fontSize}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
+            ctx.font = `bold ${fontSize}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
             ctx.fillStyle = color;
             ctx.fillText(char, x, y);
         }
@@ -511,7 +607,8 @@
             document.getElementById('renderMode').textContent = state.renderMode;
             document.getElementById('paletteName').textContent = getPaletteName(state.colorPalette);
             
-            const progress = Math.min(100, Math.floor((state.radius / (Math.min(canvas.width, canvas.height) / 2)) * 100));
+            const maxRadius = Math.min(state.centerX, state.centerY) - 20;
+            const progress = Math.min(100, Math.floor((state.radius / maxRadius) * 100));
             document.getElementById('generationProgress').textContent = `${progress}%`;
         }
         
@@ -528,7 +625,7 @@
         }
         
         // Clear canvas
-        document.getElementById('clearBtn').addEventListener('click', () => {
+        function clearCanvas() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             state.charactersTyped = 0;
             state.angle = 0;
@@ -536,10 +633,16 @@
             state.particles = [];
             typeInput.value = '';
             updateStats();
+        }
+        
+        document.getElementById('clearBtn').addEventListener('click', clearCanvas);
+        document.getElementById('clearBtn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            clearCanvas();
         });
         
         // Change render mode
-        document.getElementById('changeModeBtn').addEventListener('click', () => {
+        function changeMode() {
             const modes = ['spiral', 'radial', 'particle', 'wave'];
             const currentIndex = modes.indexOf(state.renderMode);
             state.renderMode = modes[(currentIndex + 1) % modes.length];
@@ -561,30 +664,42 @@
                 state.charactersTyped = text.length;
                 updateStats();
             }, 100);
+        }
+        
+        document.getElementById('changeModeBtn').addEventListener('click', changeMode);
+        document.getElementById('changeModeBtn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            changeMode();
         });
         
         // Randomize color palette
-        document.getElementById('randomizeBtn').addEventListener('click', () => {
+        function randomizePalette() {
             const paletteKeys = Object.keys(palettes);
             const randomKey = paletteKeys[Math.floor(Math.random() * paletteKeys.length)];
             state.colorPalette = randomKey;
             updateStats();
+        }
+        
+        document.getElementById('randomizeBtn').addEventListener('click', randomizePalette);
+        document.getElementById('randomizeBtn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            randomizePalette();
         });
         
         // Animation loop for particle mode
         function animate() {
-            if (state.renderMode === 'particle' && state.particles.length > 0) {
+            if (state.renderMode === 'particle') {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
                 state.particles.forEach((p, index) => {
                     p.x += p.vx;
                     p.y += p.vy;
-                    p.life -= 0.005;
+                    p.life -= 0.008;
                     
                     if (p.life <= 0) {
                         state.particles.splice(index, 1);
                     } else {
-                        ctx.font = `${p.size}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
+                        ctx.font = `bold ${p.size}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
                         ctx.fillStyle = p.color;
                         ctx.globalAlpha = p.life;
                         ctx.fillText(p.char, p.x, p.y);
@@ -606,8 +721,7 @@
         // Function to redraw canvas (for resize)
         function redrawCanvas() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            state.centerX = canvas.width / 2;
-            state.centerY = canvas.height / 2;
+            updateCenter();
             
             // If we have existing content, redraw it
             if (typeInput.value) {
@@ -622,6 +736,19 @@
                 }, 100);
             }
         }
+
+        // Test function to verify art generation
+        function testArtGeneration() {
+            console.log("Testing art generation...");
+            addCharacterToArt('T');
+            addCharacterToArt('E');
+            addCharacterToArt('S');
+            addCharacterToArt('T');
+            console.log("Art generation test complete");
+        }
+
+        // Run test after short delay
+        setTimeout(testArtGeneration, 1000);
     </script>
 </body>
 </html>
