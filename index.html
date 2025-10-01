@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FontForge | Full-Screen Generative Art</title>
+    <title>FontForge | Minimal Generative Art</title>
     <style>
         :root {
             --primary-color: #0a0a12;
@@ -54,279 +54,195 @@
             display: block;
         }
         
-        /* Typing interface that appears on focus */
-        .typing-interface {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(10, 10, 18, 0.95);
-            border-top: 2px solid var(--accent-color);
-            padding: 15px;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-            z-index: 100;
-        }
-        
-        .typing-interface.active {
-            transform: translateY(0);
-        }
-        
-        .type-input {
-            width: 100%;
-            padding: 15px;
-            background: rgba(22, 22, 37, 0.9);
-            border: 2px solid var(--accent-color);
-            border-radius: 10px;
-            color: var(--text-color);
-            font-family: var(--font-sample);
-            font-size: 18px;
-            resize: none;
-            margin-bottom: 15px;
-            -webkit-appearance: none;
-        }
-        
-        .type-input:focus {
-            outline: none;
-            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
-        }
-        
-        /* Controls bar */
+        /* Minimal controls bar */
         .controls-bar {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(10, 10, 18, 0.9);
-            padding: 15px;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            background: rgba(10, 10, 18, 0.85);
+            padding: 6px 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 50;
-            border-bottom: 1px solid rgba(78, 205, 196, 0.3);
+            border-radius: 6px;
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            font-size: 10px;
         }
         
         .app-title {
             font-family: var(--font-sample);
-            font-size: 1.5rem;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .control-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        
-        button {
-            padding: 10px 20px;
-            background: var(--accent-color);
-            color: var(--primary-color);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: var(--font-sample);
+            font-size: 10px;
             font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        
-        button:hover {
-            background: #ff6b6b;
-            transform: translateY(-2px);
-        }
-        
-        /* Glyph palette */
-        .glyph-palette {
-            position: fixed;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(10, 10, 18, 0.9);
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid var(--accent-color);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            z-index: 40;
-        }
-        
-        .glyph-option {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(22, 22, 37, 0.9);
-            border: 1px solid var(--accent-color);
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: var(--font-sample);
-            font-size: 1.2rem;
-            transition: all 0.2s ease;
-        }
-        
-        .glyph-option:hover, .glyph-option.active {
-            background: var(--accent-color);
-            color: var(--primary-color);
-            transform: scale(1.1);
-        }
-        
-        /* Mode selector */
-        .mode-selector {
-            position: fixed;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(10, 10, 18, 0.9);
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid var(--accent-color);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 40;
-        }
-        
-        .mode-option {
-            padding: 10px 15px;
-            background: rgba(22, 22, 37, 0.9);
-            border: 1px solid var(--accent-color);
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: var(--font-sample);
-            text-align: center;
-            transition: all 0.2s ease;
-        }
-        
-        .mode-option:hover, .mode-option.active {
-            background: var(--accent-color);
-            color: var(--primary-color);
-        }
-        
-        /* Stats panel */
-        .stats-panel {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(10, 10, 18, 0.9);
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid var(--accent-color);
-            font-family: var(--font-sample);
-            font-size: 0.9rem;
-            z-index: 40;
-        }
-        
-        .stat {
-            margin-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-        }
-        
-        /* Mobile optimizations */
-        @media (max-width: 768px) {
-            .controls-bar {
-                padding: 10px;
-            }
-            
-            .app-title {
-                font-size: 1.2rem;
-            }
-            
-            button {
-                padding: 8px 15px;
-                font-size: 0.9rem;
-            }
-            
-            .glyph-palette, .mode-selector {
-                position: static;
-                transform: none;
-                flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: center;
-                margin: 10px;
-                order: -1;
-            }
-            
-            .mobile-layout {
-                display: flex;
-                flex-direction: column;
-            }
-            
-            .top-controls {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 10px;
-                padding: 10px;
-            }
-            
-            .type-input {
-                font-size: 16px; /* Prevents zoom on iOS */
-            }
-        }
-        
-        /* Welcome message */
-        .welcome-message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(10, 10, 18, 0.95);
-            padding: 30px;
-            border-radius: 15px;
-            border: 2px solid var(--accent-color);
-            text-align: center;
-            max-width: 500px;
-            z-index: 100;
-        }
-        
-        .welcome-message h2 {
-            font-family: var(--font-sample);
-            margin-bottom: 15px;
             color: var(--accent-color);
         }
         
-        .welcome-message p {
-            margin-bottom: 20px;
+        .control-group {
+            display: flex;
+            gap: 6px;
+            align-items: center;
         }
         
-        .hidden {
-            display: none;
+        select, button {
+            padding: 4px 8px;
+            background: rgba(22, 22, 37, 0.9);
+            color: var(--text-color);
+            border: 1px solid var(--accent-color);
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: var(--font-sample);
+            font-size: 9px;
+            transition: all 0.2s ease;
+        }
+        
+        select {
+            min-width: 70px;
+        }
+        
+        button:hover, select:hover {
+            background: var(--accent-color);
+            color: var(--primary-color);
+        }
+        
+        /* Single line input */
+        .input-line {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            background: rgba(10, 10, 18, 0.9);
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--accent-color);
+            z-index: 50;
+        }
+        
+        .type-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-family: var(--font-sample);
+            font-size: 14px;
+            outline: none;
+            padding: 2px 0;
+        }
+        
+        .type-input::placeholder {
+            color: rgba(78, 205, 196, 0.6);
+        }
+        
+        /* Stats - minimal */
+        .stats {
+            position: fixed;
+            bottom: 40px;
+            right: 8px;
+            background: rgba(10, 10, 18, 0.8);
+            padding: 6px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            font-family: var(--font-sample);
+            font-size: 9px;
+            z-index: 40;
+        }
+        
+        /* Angle control */
+        .angle-control {
+            position: fixed;
+            top: 40px;
+            right: 8px;
+            background: rgba(10, 10, 18, 0.8);
+            padding: 6px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            font-family: var(--font-sample);
+            font-size: 9px;
+            z-index: 40;
+        }
+        
+        .angle-slider {
+            width: 80px;
+            margin: 4px 0;
         }
         
         /* Save confirmation */
         .save-confirmation {
             position: fixed;
-            top: 20px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translate(-50%, -50%);
             background: rgba(78, 205, 196, 0.9);
             color: var(--primary-color);
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 8px 16px;
+            border-radius: 4px;
             font-family: var(--font-sample);
+            font-size: 10px;
             z-index: 100;
             opacity: 0;
             transition: opacity 0.3s ease;
+            pointer-events: none;
         }
         
         .save-confirmation.show {
             opacity: 1;
         }
+        
+        /* Mode descriptions */
+        .mode-hint {
+            position: fixed;
+            top: 40px;
+            left: 8px;
+            background: rgba(10, 10, 18, 0.8);
+            padding: 6px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            font-family: var(--font-sample);
+            font-size: 8px;
+            max-width: 200px;
+            z-index: 40;
+            display: none;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .controls-bar {
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+            
+            .control-group {
+                flex: 1;
+                justify-content: flex-end;
+            }
+            
+            select, button {
+                flex: 1;
+                min-width: 0;
+            }
+            
+            .stats, .angle-control {
+                font-size: 8px;
+                padding: 4px 6px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- Controls -->
+        <!-- Minimal Controls -->
         <div class="controls-bar">
-            <div class="app-title">FontForge</div>
-            <div class="control-buttons">
-                <button id="saveBtn">Save Art</button>
-                <button id="newBtn">New Canvas</button>
+            <div class="app-title">FONTFORGE</div>
+            <div class="control-group">
+                <select id="modeSelect">
+                    <option value="spiral">Spiral</option>
+                    <option value="radial">Radial</option>
+                    <option value="wave">Wave</option>
+                    <option value="matrix">Matrix</option>
+                    <option value="freeform">Freeform</option>
+                </select>
+                <button id="saveBtn">SAVE</button>
+                <button id="centerBtn">CENTER</button>
             </div>
         </div>
         
@@ -335,47 +251,28 @@
             <canvas id="artCanvas"></canvas>
         </div>
         
-        <!-- Typing Interface -->
-        <div class="typing-interface" id="typingInterface">
-            <textarea class="type-input" id="typeInput" placeholder="Type here to create art... Your masterpiece auto-saves!"></textarea>
-            <div style="text-align: center; color: #4ecdc4; font-size: 0.9rem;">
-                Tap outside to hide keyboard • Art auto-saves
-            </div>
-        </div>
-        
-        <!-- Glyph Palette -->
-        <div class="glyph-palette" id="glyphPalette">
-            <!-- Glyphs will be added by JavaScript -->
-        </div>
-        
-        <!-- Mode Selector -->
-        <div class="mode-selector" id="modeSelector">
-            <!-- Modes will be added by JavaScript -->
+        <!-- Single Line Input -->
+        <div class="input-line">
+            <input type="text" class="type-input" id="typeInput" placeholder="Type to create art... (auto-saves)">
         </div>
         
         <!-- Stats -->
-        <div class="stats-panel">
-            <div class="stat">
-                <span>Characters:</span>
-                <span id="charCount">0</span>
-            </div>
-            <div class="stat">
-                <span>Mode:</span>
-                <span id="renderMode">Spiral</span>
-            </div>
+        <div class="stats">
+            <span id="charCount">0</span> chars
         </div>
         
-        <!-- Welcome Message -->
-        <div class="welcome-message" id="welcomeMessage">
-            <h2>Welcome to FontForge</h2>
-            <p>Type to create generative art. Each character adds to your masterpiece.</p>
-            <p><strong>Your art automatically saves</strong> and will be here when you return.</p>
-            <button id="startBtn" style="margin-top: 15px;">Start Creating</button>
+        <!-- Angle Control -->
+        <div class="angle-control">
+            <div>ANGLE: <span id="angleValue">0°</span></div>
+            <input type="range" class="angle-slider" id="angleSlider" min="0" max="360" value="0" step="1">
         </div>
+        
+        <!-- Mode Hint -->
+        <div class="mode-hint" id="modeHint"></div>
         
         <!-- Save Confirmation -->
         <div class="save-confirmation" id="saveConfirmation">
-            Art Saved!
+            ART SAVED
         </div>
     </div>
 
@@ -384,19 +281,20 @@
         const canvas = document.getElementById('artCanvas');
         const ctx = canvas.getContext('2d');
         
-        // Application state - with auto-save
+        // Application state
         const state = {
             charactersTyped: 0,
             renderMode: 'spiral',
-            currentGlyph: 'A',
+            currentAngle: 0,
             centerX: 0,
             centerY: 0,
             angle: 0,
             radius: 0,
             growthFactor: 0.8,
             colorIndex: 0,
-            artPieces: [], // Store all drawn elements for persistence
-            autoSave: true
+            artPieces: [],
+            autoSave: true,
+            customCenter: null
         };
         
         // Color palettes
@@ -407,113 +305,102 @@
             neon: ['#ff00ff', '#00ffff', '#ffff00', '#ff0080', '#80ff00']
         };
         
-        // Available glyphs
-        const glyphs = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 
-                       'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-                       '&', '#', '@', '%', '*', '+', '=', '-', '_', '~'];
-        
-        // Render modes
-        const renderModes = [
-            { id: 'spiral', name: 'Spiral' },
-            { id: 'radial', name: 'Radial' },
-            { id: 'wave', name: 'Wave' },
-            { id: 'matrix', name: 'Matrix' }
-        ];
-        
+        // Mode descriptions
+        const modeHints = {
+            spiral: "Characters spiral outward from center",
+            radial: "Characters arranged in circular patterns", 
+            wave: "Wave-like patterns across the canvas",
+            matrix: "Grid-based character placement",
+            freeform: "Free placement based on typing rhythm"
+        };
+
         // Set canvas to full screen
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            state.centerX = canvas.width / 2;
-            state.centerY = canvas.height / 2;
             
-            // Redraw all saved art pieces
+            // Set center - use custom center if set, otherwise screen center
+            if (state.customCenter) {
+                state.centerX = state.customCenter.x;
+                state.centerY = state.customCenter.y;
+            } else {
+                state.centerX = canvas.width / 2;
+                state.centerY = canvas.height / 2;
+            }
+            
             redrawCanvas();
         }
-        
+
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
-        
+
         // Initialize UI
         function initializeUI() {
-            // Glyph palette
-            const glyphPalette = document.getElementById('glyphPalette');
-            glyphs.forEach(glyph => {
-                const glyphElement = document.createElement('div');
-                glyphElement.className = 'glyph-option';
-                if (glyph === state.currentGlyph) {
-                    glyphElement.classList.add('active');
-                }
-                glyphElement.textContent = glyph;
-                glyphElement.addEventListener('click', () => setCurrentGlyph(glyph));
-                glyphPalette.appendChild(glyphElement);
-            });
-            
             // Mode selector
-            const modeSelector = document.getElementById('modeSelector');
-            renderModes.forEach(mode => {
-                const modeElement = document.createElement('div');
-                modeElement.className = 'mode-option';
-                if (mode.id === state.renderMode) {
-                    modeElement.classList.add('active');
-                }
-                modeElement.textContent = mode.name;
-                modeElement.addEventListener('click', () => setRenderMode(mode.id));
-                modeSelector.appendChild(modeElement);
+            const modeSelect = document.getElementById('modeSelect');
+            modeSelect.value = state.renderMode;
+            modeSelect.addEventListener('change', (e) => {
+                state.renderMode = e.target.value;
+                showModeHint();
+                // Don't clear canvas - keep existing art
+                updateModeHint();
             });
+
+            // Angle slider
+            const angleSlider = document.getElementById('angleSlider');
+            const angleValue = document.getElementById('angleValue');
             
-            // Typing interface
+            angleSlider.addEventListener('input', (e) => {
+                state.currentAngle = parseInt(e.target.value);
+                angleValue.textContent = state.currentAngle + '°';
+                // Apply angle to new characters without clearing
+                redrawCanvas();
+            });
+
+            // Typing input
             const typeInput = document.getElementById('typeInput');
-            const typingInterface = document.getElementById('typingInterface');
-            
-            typeInput.addEventListener('focus', () => {
-                typingInterface.classList.add('active');
-            });
-            
-            typeInput.addEventListener('blur', () => {
-                // Small delay to allow clicking buttons
-                setTimeout(() => {
-                    typingInterface.classList.remove('active');
-                }, 200);
-            });
-            
             typeInput.addEventListener('input', handleTyping);
             
-            // Start button
-            document.getElementById('startBtn').addEventListener('click', () => {
-                document.getElementById('welcomeMessage').classList.add('hidden');
-                typeInput.focus();
-            });
-            
+            // Auto-focus input
+            setTimeout(() => typeInput.focus(), 500);
+
             // Save button
             document.getElementById('saveBtn').addEventListener('click', saveArt);
-            
-            // New canvas button
-            document.getElementById('newBtn').addEventListener('click', newCanvas);
-            
-            // Click anywhere on canvas to focus typing
-            canvas.addEventListener('click', () => {
-                typeInput.focus();
+
+            // Center button - set new center point
+            document.getElementById('centerBtn').addEventListener('click', setNewCenter);
+
+            // Click on canvas to set new center
+            canvas.addEventListener('click', (e) => {
+                setCenterFromClick(e);
+            });
+
+            // Show mode hint on hover
+            modeSelect.addEventListener('mouseenter', showModeHint);
+            modeSelect.addEventListener('mouseleave', hideModeHint);
+            modeSelect.addEventListener('touchstart', showModeHint);
+
+            // Hide hint after delay on mobile
+            modeSelect.addEventListener('touchend', () => {
+                setTimeout(hideModeHint, 2000);
             });
         }
-        
-        // Set current glyph
-        function setCurrentGlyph(glyph) {
-            state.currentGlyph = glyph;
-            document.querySelectorAll('.glyph-option').forEach(opt => {
-                opt.classList.toggle('active', opt.textContent === glyph);
-            });
+
+        // Set new center from click
+        function setNewCenter() {
+            state.customCenter = null; // Reset to auto-center on next click
+            alert('Click anywhere on canvas to set new center point');
         }
-        
-        // Set render mode
-        function setRenderMode(mode) {
-            state.renderMode = mode;
-            document.querySelectorAll('.mode-option').forEach(opt => {
-                opt.classList.toggle('active', opt.textContent === renderModes.find(m => m.id === mode).name);
-            });
-            document.getElementById('renderMode').textContent = renderModes.find(m => m.id === mode).name;
+
+        function setCenterFromClick(e) {
+            const rect = canvas.getBoundingClientRect();
+            state.customCenter = {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+            resizeCanvas(); // This will update the center
         }
-        
+
         // Handle typing input
         function handleTyping(e) {
             const newText = e.target.value;
@@ -526,25 +413,25 @@
                 state.charactersTyped = newText.length;
                 updateStats();
                 
-                // Auto-save after typing
+                // Auto-save
                 if (state.autoSave) {
                     autoSaveArt();
                 }
             }
         }
-        
-        // Add character to art (persistent)
+
+        // Add character to art
         function addCharacterToArt(char) {
             const artPiece = {
                 char: char,
                 mode: state.renderMode,
-                glyph: state.currentGlyph,
                 timestamp: Date.now(),
                 position: {
                     x: state.centerX,
                     y: state.centerY,
                     angle: state.angle,
-                    radius: state.radius
+                    radius: state.radius,
+                    globalAngle: state.currentAngle
                 }
             };
             
@@ -556,115 +443,162 @@
             state.radius += state.growthFactor;
             
             // Reset radius if it gets too large
-            const maxRadius = Math.min(state.centerX, state.centerY) * 0.8;
+            const maxRadius = Math.min(canvas.width, canvas.height) * 0.8;
             if (state.radius > maxRadius) {
                 state.radius = 0;
                 state.colorIndex = (state.colorIndex + 1) % palettes.deepOcean.length;
             }
         }
-        
-        // Draw a single art piece
+
+        // Draw a single art piece with rotation
         function drawArtPiece(artPiece) {
             const colors = palettes.deepOcean;
-            const charToDraw = artPiece.glyph;
+            
+            // Save context for rotation
+            ctx.save();
+            
+            // Apply global rotation if not zero
+            if (artPiece.position.globalAngle !== 0) {
+                ctx.translate(artPiece.position.x, artPiece.position.y);
+                ctx.rotate(artPiece.position.globalAngle * Math.PI / 180);
+                ctx.translate(-artPiece.position.x, -artPiece.position.y);
+            }
             
             switch(artPiece.mode) {
                 case 'spiral':
-                    drawSpiral(charToDraw, artPiece.position, colors);
+                    drawSpiral(artPiece.char, artPiece.position, colors);
                     break;
                 case 'radial':
-                    drawRadial(charToDraw, artPiece.position, colors);
+                    drawRadial(artPiece.char, artPiece.position, colors);
                     break;
                 case 'wave':
-                    drawWave(charToDraw, artPiece.position, colors);
+                    drawWave(artPiece.char, artPiece.position, colors);
                     break;
                 case 'matrix':
-                    drawMatrix(charToDraw, artPiece.position, colors);
+                    drawMatrix(artPiece.char, artPiece.position, colors);
+                    break;
+                case 'freeform':
+                    drawFreeform(artPiece.char, artPiece.position, colors);
                     break;
             }
+            
+            // Restore context
+            ctx.restore();
         }
-        
+
         // Drawing functions
         function drawSpiral(char, position, colors) {
             const x = position.x + Math.cos(position.angle) * position.radius;
             const y = position.y + Math.sin(position.angle) * position.radius;
             
-            const fontSize = Math.max(12, 14 + (position.radius / 20));
-            const color = colors[Math.floor(position.angle) % colors.length];
+            const fontSize = Math.max(10, 12 + (position.radius / 25));
+            const color = colors[Math.floor(position.angle * 10) % colors.length];
             
             ctx.font = `bold ${fontSize}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
             ctx.fillStyle = color;
             ctx.fillText(char, x, y);
         }
-        
+
         function drawRadial(char, position, colors) {
             const segmentAngle = (2 * Math.PI) / 24;
             const currentAngle = (state.artPieces.length % 24) * segmentAngle;
-            const radius = 40 + Math.floor(state.artPieces.length / 24) * 18;
+            const radius = 30 + Math.floor(state.artPieces.length / 24) * 15;
             
             const x = position.x + Math.cos(currentAngle) * radius;
             const y = position.y + Math.sin(currentAngle) * radius;
             
-            const fontSize = 16;
+            const fontSize = 14;
             const color = colors[state.artPieces.length % colors.length];
             
             ctx.font = `bold ${fontSize}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
             ctx.fillStyle = color;
             ctx.fillText(char, x, y);
         }
-        
+
         function drawWave(char, position, colors) {
-            const waveIndex = Math.floor(state.artPieces.length / 40);
-            const y = position.y + Math.sin(position.angle * 3) * 60;
-            const x = position.x + (state.artPieces.length % 40) * 25 - 500;
+            const waveIndex = Math.floor(state.artPieces.length / 30);
+            const y = position.y + Math.sin(position.angle * 2) * 40;
+            const x = position.x + (state.artPieces.length % 30) * 20 - 300;
             
-            const fontSize = 18;
+            const fontSize = 16;
             const color = colors[waveIndex % colors.length];
             
             ctx.font = `bold ${fontSize}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
             ctx.fillStyle = color;
             ctx.fillText(char, x, y);
         }
-        
+
         function drawMatrix(char, position, colors) {
-            const cols = 15;
-            const colWidth = canvas.width / cols;
+            const cols = Math.floor(canvas.width / 30);
             const row = Math.floor(state.artPieces.length / cols);
             const col = state.artPieces.length % cols;
             
-            const x = col * colWidth + (Math.random() * 20 - 10);
-            const y = row * 30 + (Math.random() * 20 - 10);
+            const x = col * 30 + (Math.random() * 10 - 5);
+            const y = row * 25 + (Math.random() * 10 - 5);
             
-            const fontSize = 16 + Math.random() * 8;
+            const fontSize = 12 + Math.random() * 6;
             const color = colors[col % colors.length];
             
             ctx.font = `bold ${fontSize}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
             ctx.fillStyle = color;
             ctx.fillText(char, x, y);
         }
-        
-        // Redraw entire canvas from saved art pieces
+
+        function drawFreeform(char, position, colors) {
+            // Freeform uses typing rhythm for placement
+            const timeVar = (Date.now() % 1000) / 1000;
+            const x = position.x + Math.cos(timeVar * Math.PI * 2) * (50 + position.radius);
+            const y = position.y + Math.sin(timeVar * Math.PI * 2) * (50 + position.radius);
+            
+            const fontSize = 14 + Math.random() * 8;
+            const color = colors[Math.floor(timeVar * colors.length)];
+            
+            ctx.font = `bold ${fontSize}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
+            ctx.fillStyle = color;
+            ctx.fillText(char, x, y);
+        }
+
+        // Redraw entire canvas
         function redrawCanvas() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             state.artPieces.forEach(drawArtPiece);
         }
-        
+
         // Update statistics
         function updateStats() {
             document.getElementById('charCount').textContent = state.charactersTyped;
         }
-        
-        // Auto-save art to localStorage
+
+        // Show mode hint
+        function showModeHint() {
+            const hint = document.getElementById('modeHint');
+            hint.textContent = modeHints[state.renderMode] || "";
+            hint.style.display = 'block';
+        }
+
+        function hideModeHint() {
+            document.getElementById('modeHint').style.display = 'none';
+        }
+
+        function updateModeHint() {
+            const hint = document.getElementById('modeHint');
+            hint.textContent = modeHints[state.renderMode] || "";
+        }
+
+        // Auto-save art
         function autoSaveArt() {
             const saveData = {
                 artPieces: state.artPieces,
                 charactersTyped: state.charactersTyped,
+                customCenter: state.customCenter,
+                renderMode: state.renderMode,
+                currentAngle: state.currentAngle,
                 timestamp: Date.now()
             };
             localStorage.setItem('fontforgeArt', JSON.stringify(saveData));
         }
-        
-        // Load saved art from localStorage
+
+        // Load saved art
         function loadSavedArt() {
             const saved = localStorage.getItem('fontforgeArt');
             if (saved) {
@@ -672,57 +606,44 @@
                     const saveData = JSON.parse(saved);
                     state.artPieces = saveData.artPieces || [];
                     state.charactersTyped = saveData.charactersTyped || 0;
+                    state.customCenter = saveData.customCenter || null;
+                    state.renderMode = saveData.renderMode || 'spiral';
+                    state.currentAngle = saveData.currentAngle || 0;
+                    
+                    // Update UI
+                    document.getElementById('modeSelect').value = state.renderMode;
+                    document.getElementById('angleSlider').value = state.currentAngle;
+                    document.getElementById('angleValue').textContent = state.currentAngle + '°';
                     
                     if (state.artPieces.length > 0) {
-                        document.getElementById('welcomeMessage').classList.add('hidden');
                         redrawCanvas();
                         updateStats();
                     }
                 } catch (e) {
-                    console.log('No previous art found or error loading');
+                    console.log('No previous art found');
                 }
             }
         }
-        
-        // Save art (with confirmation)
+
+        // Save art with confirmation
         function saveArt() {
             autoSaveArt();
             showSaveConfirmation();
         }
-        
-        // New canvas
-        function newCanvas() {
-            if (confirm('Start a new canvas? Your current art will be saved.')) {
-                state.artPieces = [];
-                state.charactersTyped = 0;
-                state.angle = 0;
-                state.radius = 0;
-                document.getElementById('typeInput').value = '';
-                redrawCanvas();
-                updateStats();
-                autoSaveArt();
-            }
-        }
-        
+
         // Show save confirmation
         function showSaveConfirmation() {
             const confirmation = document.getElementById('saveConfirmation');
             confirmation.classList.add('show');
             setTimeout(() => {
                 confirmation.classList.remove('show');
-            }, 2000);
+            }, 1500);
         }
-        
+
         // Initialize everything
         initializeUI();
         loadSavedArt();
-        
-        // Auto-focus on input after a short delay
-        setTimeout(() => {
-            if (state.artPieces.length === 0) {
-                document.getElementById('typeInput').focus();
-            }
-        }, 1000);
+        updateModeHint();
     </script>
 </body>
 </html>
