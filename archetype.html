@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FontForge | Archetypal Canvas</title>
+    <style>
+        :root {
+            --primary-color: #0a0a12;
+            --secondary-color: #161625;
+            --accent-color: #4ecdc4;
+            --text-color: #e6e6e6;
+            --font-sample: 'Courier New', monospace;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: var(--primary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+        }
+        
+        /* Full-screen canvas */
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            background: var(--primary-color);
+            overflow: hidden;
+        }
+        
+        #artCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        /* Minimal controls bar */
+        .controls-bar {
+            position: fixed;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            background: rgba(10, 10, 18, 0.95);
+            padding: 6px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 50;
+            border-radius: 6px;
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            font-size: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .app-title {
+            font-family: var(--font-sample);
+            font-size: 10px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        .control-group {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        
+        select, button {
+            padding: 4px 8px;
+            background: rgba(22, 22, 37, 0.9);
+            color: var(--text-color);
+            border: 1px solid var(--accent-color);
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: var(--font-sample);
+            font-size: 9px;
+            transition: all 0.2s ease;
+        }
+        
+        select {
+            min-width: 70px;
+        }
+        
+        button:hover, select:hover {
+            background: var(--accent-color);
+            color: var(--primary-color);
+        }
+        
+        /* Single line input */
+        .input-line {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            background: rgba(10, 10, 18, 0.95);
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--accent-color);
+            z-index: 50;
+            backdrop-filter: blur(10px);
+        }
+        
+        .type-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-family: var(--font-sample);
+            font-size: 14px;
+            outline: none;
+            padding: 2px 0;
+        }
+        
+        .type-input::placeholder {
+            color: rgba(78, 205, 196, 0.6);
+        }
+        
+        /* Brush Studio - Collapsible */
+        .brush-studio {
+            position: fixed;
+            top: 40px;
+            right: 8px;
+            background: rgba(10, 10, 18, 0.95);
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            font-family: var(--font-sample);
+            font-size: 9px;
+            z-index: 40;
+            backdrop-filter: blur(10px);
+            min-width: 140px;
+            transition: all 0.3s ease;
+        }
+        
+        .studio-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            color: var(--accent-color);
+            cursor: pointer;
+        }
+        
+        .studio-content {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .studio-collapsed {
+            height: 30px;
+            overflow: hidden;
+        }
+        
+        .studio-collapsed .studio-content {
+            display: none;
+        }
+        
+        .control-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .control-label {
+            color: var(--accent-color);
+        }
+        
+        .control-value {
+            color: var(--text-color);
+            min-width: 30px;
+            text-align: right;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            margin: 2px 0;
+        }
+        
+        /* Archetype Chamber */
+        .archetype-chamber {
+            position: fixed;
+            top: 40px;
+            left: 8px;
+            background: rgba(10, 10, 18, 0.95);
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            font-family: var(--font-sample);
+            font-size: 9px;
+            z-index: 40;
+            backdrop-filter: blur(10px);
+            min-width: 120px;
+        }
+        
+        .archetype-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            margin-top: 6px;
+        }
+        
+        .archetype-btn {
+            padding: 4px 6px;
+            background: rgba(22, 22, 37, 0.9);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            border-radius: 3px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+            font-size: 8px;
+        }
+        
+        .archetype-btn:hover, .archetype-btn.active {
+            background: var(--accent-color);
+            color: var(--primary-color);
+            border-color: var(--accent-color);
+        }
+        
+        /* Stats */
+        .stats {
+            position: fixed;
+            bottom: 40px;
+            right: 8px;
+            background: rgba(10, 10, 18, 0.85);
+            padding: 6px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            font-family: var(--font-sample);
+            font-size: 9px;
+            z-index: 40;
+            backdrop-filter: blur(5px);
+        }
+        
+        /* NPC Dialog */
+        .npc-dialog {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 10, 18, 0.95);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--accent-color);
+            font-family: var(--font-sample);
+            font-size: 9px;
+            z-index: 60;
+            backdrop-filter: blur(10px);
+            max-width: 300px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .npc-dialog.show {
+            opacity: 1;
+        }
+        
+        .npc-name {
+            color: var(--accent-color);
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        /* Save confirmation */
+        .save-confirmation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(78, 205, 196, 0.9);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-family: var(--font-sample);
+            font-size: 10px;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            backdrop-filter: blur(10px);
+        }
+        
+        .save-confirmation.show {
+            opacity: 1;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .controls-bar {
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+            
+            .control-group {
+                flex: 1;
+                justify-content: flex-end;
+            }
+            
+            select, button {
+                flex: 1;
+                min-width: 0;
+            }
+            
+            .brush-studio, .archetype-chamber {
+                font-size: 8px;
+                padding: 6px;
+                min-width: 120px;
+            }
+            
+            .stats {
+                font-size: 8px;
+                padding: 4px 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Minimal Controls -->
+        <div class="controls-bar">
+            <div class="app-title">FONTFORGE ARCHEYPES</div>
+            <div class="control-group">
+                <button id="randomizeBtn">RANDOM BRUSH</button>
+                <button id="saveBtn">SAVE</button>
+                <button id="clearBtn">CLEAR</button>
+            </div>
+        </div>
+        
+        <!-- Canvas -->
+        <div class="canvas-container">
+            <canvas id="artCanvas"></canvas>
+        </div>
+        
+        <!-- Single Line Input -->
+        <div class="input-line">
+            <input type="text" class="type-input" id="typeInput" placeholder="Type to paint with archetypes... each character reveals their story...">
+        </div>
+        
+        <!-- Brush Studio -->
+        <div class="brush-studio" id="brushStudio">
+            <div class="studio-header" id="studioToggle">
+                <span>BRUSH STUDIO</span>
+                <span>▼</span>
+            </div>
+            <div class="studio-content">
+                <div class="control-row">
+                    <span class="control-label">SIZE</span>
+                    <span class="control-value" id="sizeValue">12</span>
+                </div>
+                <input type="range" id="sizeSlider" min="8" max="48" value="12">
+                
+                <div class="control-row">
+                    <span class="control-label">OPACITY</span>
+                    <span class="control-value" id="opacityValue">80%</span>
+                </div>
+                <input type="range" id="opacitySlider" min="20" max="100" value="80">
+                
+                <div class="control-row">
+                    <span class="control-label">SPACING</span>
+                    <span class="control-value" id="spacingValue">15</span>
+                </div>
+                <input type="range" id="spacingSlider" min="5" max="50" value="15">
+                
+                <div class="control-row">
+                    <span class="control-label">JITTER</span>
+                    <span class="control-value" id="jitterValue">20%</span>
+                </div>
+                <input type="range" id="jitterSlider" min="0" max="100" value="20">
+            </div>
+        </div>
+        
+        <!-- Archetype Chamber -->
+        <div class="archetype-chamber">
+            <div>ARCHETYPE CHAMBER</div>
+            <div class="archetype-grid">
+                <div class="archetype-btn active" data-archetype="wanderer">Wd</div>
+                <div class="archetype-btn" data-archetype="conway">Cw</div>
+                <div class="archetype-btn" data-archetype="mountain">M</div>
+                <div class="archetype-btn" data-archetype="river">R</div>
+                <div class="archetype-btn" data-archetype="constellation">Cs</div>
+                <div class="archetype-btn" data-archetype="weather">Wh</div>
+            </div>
+        </div>
+        
+        <!-- Stats -->
+        <div class="stats">
+            <span id="charCount">0</span> chars • <span id="archetypeCount">0</span> archetypes
+        </div>
+        
+        <!-- NPC Dialog -->
+        <div class="npc-dialog" id="npcDialog">
+            <div class="npc-name" id="npcName">Wanderer</div>
+            <div class="npc-message" id="npcMessage">Where shall we explore today?</div>
+        </div>
+        
+        <!-- Save Confirmation -->
+        <div class="save-confirmation" id="saveConfirmation">
+            CANVAS ARCHIVED
+        </div>
+    </div>
+
+    <script>
+        // Canvas setup
+        const canvas = document.getElementById('artCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Archetypal State
+        const state = {
+            charactersTyped: 0,
+            activeArchetype: 'wanderer',
+            brushSettings: {
+                size: 12,
+                opacity: 0.8,
+                spacing: 15,
+                jitter: 0.2,
+                texture: 'A',
+                colorPalette: 'energetic'
+            },
+            archetypeInteractions: new Map(),
+            npcRelationships: new Map(),
+            lastPaintPosition: null,
+            archetypeHistory: [],
+            currentDialog: null
+        };
+
+        // Archetype Personalities
+        const archetypes = {
+            wanderer: {
+                name: "Wanderer",
+                color: '#4ecdc4',
+                greeting: "Where shall we explore today?",
+                traits: ['curious', 'restless', 'observant'],
+                relationships: {}
+            },
+            conway: {
+                name: "Conway",
+                color: '#ff6b6b', 
+                greeting: "Life finds a way. Shall we play?",
+                traits: ['logical', 'emergent', 'patterned'],
+                relationships: {}
+            },
+            mountain: {
+                name: "Mountain",
+                color: '#386641',
+                greeting: "From great heights, perspective grows.",
+                traits: ['enduring', 'majestic', 'grounded'],
+                relationships: {}
+            },
+            river: {
+                name: "River",
+                color: '#45b7d1',
+                greeting: "Flow with me to unknown destinations.",
+                traits: ['fluid', 'persistent', 'adaptable'],
+                relationships: {}
+            },
+            constellation: {
+                name: "Constellation",
+                color: '#8ac6d1',
+                greeting: "Even distant points can create meaning.",
+                traits: ['connected', 'celestial', 'mysterious'],
+                relationships: {}
+            },
+            weather: {
+                name: "Weather",
+                color: '#ffa726',
+                greeting: "Change is the only constant. Embrace it.",
+                traits: ['dynamic', 'unpredictable', 'atmospheric'],
+                relationships: {}
+            }
+        };
+
+        // Color palettes for different moods
+        const moodPalettes = {
+            energetic: ['#ff6b6b', '#ffa726', '#ffee58', '#4ecdc4', '#45b7d1'],
+            calm: ['#8ac6d1', '#bbded6', '#fae3d9', '#ffb6b9', '#61c0bf'],
+            mysterious: ['#6a0572', '#ab83a1', '#c8b6ff', '#b8c0ff', '#bbd0ff'],
+            natural: ['#386641', '#6a994e', '#a7c957', '#f2e8cf', '#bc4749']
+        };
+
+        // Set canvas to full screen
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            redrawCanvas();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Initialize UI
+        function initializeUI() {
+            // Brush studio toggle
+            document.getElementById('studioToggle').addEventListener('click', toggleBrushStudio);
+            
+            // Brush controls
+            initializeBrushControls();
+            
+            // Archetype selection
+            document.querySelectorAll('.archetype-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const archetype = e.target.dataset.archetype;
+                    setActiveArchetype(archetype);
+                });
+            });
+            
+            // Typing input
+            const typeInput = document.getElementById('typeInput');
+            typeInput.addEventListener('input', handleTyping);
+            typeInput.addEventListener('keydown', handleSpecialKeys);
+            
+            // Auto-focus input
+            setTimeout(() => typeInput.focus(), 500);
+            
+            // Control buttons
+            document.getElementById('randomizeBtn').addEventListener('click', randomizeBrush);
+            document.getElementById('saveBtn').addEventListener('click', saveCanvas);
+            document.getElementById('clearBtn').addEventListener('click', clearCanvas);
+            
+            // Initial NPC dialog
+            setTimeout(() => showNPCDialog(archetypes.wanderer), 1000);
+        }
+
+        function initializeBrushControls() {
+            // Size slider
+            const sizeSlider = document.getElementById('sizeSlider');
+            const sizeValue = document.getElementById('sizeValue');
+            sizeSlider.value = state.brushSettings.size;
+            sizeValue.textContent = state.brushSettings.size;
+            sizeSlider.addEventListener('input', (e) => {
+                state.brushSettings.size = parseInt(e.target.value);
+                sizeValue.textContent = state.brushSettings.size;
+            });
+            
+            // Opacity slider
+            const opacitySlider = document.getElementById('opacitySlider');
+            const opacityValue = document.getElementById('opacityValue');
+            opacitySlider.value = state.brushSettings.opacity * 100;
+            opacityValue.textContent = Math.round(state.brushSettings.opacity * 100) + '%';
+            opacitySlider.addEventListener('input', (e) => {
+                state.brushSettings.opacity = parseInt(e.target.value) / 100;
+                opacityValue.textContent = e.target.value + '%';
+            });
+            
+            // Spacing slider
+            const spacingSlider = document.getElementById('spacingSlider');
+            const spacingValue = document.getElementById('spacingValue');
+            spacingSlider.value = state.brushSettings.spacing;
+            spacingValue.textContent = state.brushSettings.spacing;
+            spacingSlider.addEventListener('input', (e) => {
+                state.brushSettings.spacing = parseInt(e.target.value);
+                spacingValue.textContent = state.brushSettings.spacing;
+            });
+            
+            // Jitter slider
+            const jitterSlider = document.getElementById('jitterSlider');
+            const jitterValue = document.getElementById('jitterValue');
+            jitterSlider.value = state.brushSettings.jitter * 100;
+            jitterValue.textContent = Math.round(state.brushSettings.jitter * 100) + '%';
+            jitterSlider.addEventListener('input', (e) => {
+                state.brushSettings.jitter = parseInt(e.target.value) / 100;
+                jitterValue.textContent = e.target.value + '%';
+            });
+        }
+
+        function toggleBrushStudio() {
+            const studio = document.getElementById('brushStudio');
+            studio.classList.toggle('studio-collapsed');
+        }
+
+        function setActiveArchetype(archetype) {
+            state.activeArchetype = archetype;
+            
+            // Update UI
+            document.querySelectorAll('.archetype-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.archetype === archetype);
+            });
+            
+            // Show archetype dialog
+            showNPCDialog(archetypes[archetype]);
+            
+            // Update brush texture based on archetype
+            updateBrushTexture();
+        }
+
+        function updateBrushTexture() {
+            const textures = {
+                wanderer: '●',
+                conway: '■',
+                mountain: '▲',
+                river: '▼',
+                constellation: '★',
+                weather: '☁'
+            };
+            state.brushSettings.texture = textures[state.activeArchetype] || '●';
+        }
+
+        // Handle typing input - now paints with brush
+        function handleTyping(e) {
+            const newText = e.target.value;
+            const newChars = newText.length - state.charactersTyped;
+            
+            if (newChars > 0) {
+                for (let i = 0; i < newChars; i++) {
+                    const char = newText[state.charactersTyped + i];
+                    paintWithCharacter(char);
+                    
+                    // Occasionally trigger archetype interactions
+                    if (Math.random() < 0.1) {
+                        triggerArchetypeInteraction(char);
+                    }
+                }
+                state.charactersTyped = newText.length;
+                updateStats();
+                
+                // Auto-save
+                autoSaveCanvas();
+            }
+        }
+
+        // Handle special keys for brush control
+        function handleSpecialKeys(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'r':
+                        e.preventDefault();
+                        randomizeBrush();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        saveCanvas();
+                        break;
+                }
+            }
+        }
+
+        // Paint with character using current brush settings
+        function paintWithCharacter(char) {
+            const position = calculateNextPaintPosition();
+            if (!position) return;
+            
+            const paintEvent = {
+                char: char,
+                archetype: state.activeArchetype,
+                brush: { ...state.brushSettings },
+                position: position,
+                timestamp: Date.now()
+            };
+            
+            state.archetypeHistory.push(paintEvent);
+            drawPaintEvent(paintEvent);
+            
+            state.lastPaintPosition = position;
+        }
+
+        function calculateNextPaintPosition() {
+            let x, y;
+            
+            if (!state.lastPaintPosition) {
+                // Start from center
+                x = canvas.width / 2;
+                y = canvas.height / 2;
+            } else {
+                // Calculate next position with spacing and jitter
+                const angle = Math.random() * Math.PI * 2;
+                const distance = state.brushSettings.spacing;
+                const jitterX = (Math.random() - 0.5) * state.brushSettings.jitter * 50;
+                const jitterY = (Math.random() - 0.5) * state.brushSettings.jitter * 50;
+                
+                x = state.lastPaintPosition.x + Math.cos(angle) * distance + jitterX;
+                y = state.lastPaintPosition.y + Math.sin(angle) * distance + jitterY;
+            }
+            
+            // Keep within canvas bounds
+            x = Math.max(10, Math.min(canvas.width - 10, x));
+            y = Math.max(10, Math.min(canvas.height - 10, y));
+            
+            return { x, y };
+        }
+
+        function drawPaintEvent(paintEvent) {
+            const colors = moodPalettes[state.brushSettings.colorPalette];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            ctx.save();
+            
+            // Apply archetype-specific transformations
+            applyArchetypeTransform(paintEvent);
+            
+            // Set brush properties
+            ctx.globalAlpha = paintEvent.brush.opacity;
+            ctx.font = `bold ${paintEvent.brush.size}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
+            ctx.fillStyle = color;
+            
+            // Draw the character
+            ctx.fillText(paintEvent.char, paintEvent.position.x, paintEvent.position.y);
+            
+            ctx.restore();
+        }
+
+        function applyArchetypeTransform(paintEvent) {
+            const archetype = paintEvent.archetype;
+            const pos = paintEvent.position;
+            
+            switch(archetype) {
+                case 'wanderer':
+                    // Gentle wandering effect
+                    ctx.translate((Math.random() - 0.5) * 3, (Math.random() - 0.5) * 3);
+                    break;
+                case 'conway':
+                    // Grid alignment
+                    const gridSize = 8;
+                    ctx.translate(
+                        Math.round(pos.x / gridSize) * gridSize - pos.x,
+                        Math.round(pos.y / gridSize) * gridSize - pos.y
+                    );
+                    break;
+                case 'mountain':
+                    // Vertical emphasis
+                    ctx.translate(0, -paintEvent.brush.size * 0.2);
+                    break;
+                case 'river':
+                    // Horizontal flow
+                    ctx.translate(paintEvent.brush.size * 0.1, 0);
+                    break;
+                case 'constellation':
+                    // Star-like sparkle
+                    const sparkle = Math.sin(Date.now() * 0.01) * 0.3;
+                    ctx.globalAlpha = paintEvent.brush.opacity * (0.7 + sparkle);
+                    break;
+                case 'weather':
+                    // Atmospheric distortion
+                    const time = Date.now() * 0.002;
+                    ctx.translate(
+                        Math.sin(time + pos.x * 0.01) * 2,
+                        Math.cos(time + pos.y * 0.01) * 2
+                    );
+                    break;
+            }
+        }
+
+        function triggerArchetypeInteraction(char) {
+            const interactingArchetype = getRandomArchetype();
+            if (interactingArchetype && interactingArchetype !== state.activeArchetype) {
+                const interaction = {
+                    from: state.activeArchetype,
+                    to: interactingArchetype,
+                    char: char,
+                    timestamp: Date.now()
+                };
+                
+                // Record interaction
+                const key = `${state.activeArchetype}-${interactingArchetype}`;
+                state.archetypeInteractions.set(key, (state.archetypeInteractions.get(key) || 0) + 1);
+                
+                // Show interaction dialog
+                showInteractionDialog(interaction);
+            }
+        }
+
+        function getRandomArchetype() {
+            const archetypeKeys = Object.keys(archetypes);
+            return archetypeKeys[Math.floor(Math.random() * archetypeKeys.length)];
+        }
+
+        function showNPCDialog(npc) {
+            const dialog = document.getElementById('npcDialog');
+            document.getElementById('npcName').textContent = npc.name;
+            document.getElementById('npcMessage').textContent = npc.greeting;
+            
+            dialog.classList.add('show');
+            setTimeout(() => {
+                dialog.classList.remove('show');
+            }, 3000);
+        }
+
+        function showInteractionDialog(interaction) {
+            const from = archetypes[interaction.from];
+            const to = archetypes[interaction.to];
+            const messages = [
+                `${from.name} whispers to ${to.name}: "${interaction.char}"`,
+                `${from.name} shares '${interaction.char}' with ${to.name}`,
+                `Between ${from.name} and ${to.name}: ${interaction.char}`,
+                `${from.name} → ${to.name}: ${interaction.char}`
+            ];
+            
+            const dialog = document.getElementById('npcDialog');
+            document.getElementById('npcName').textContent = "Archetype Dialogue";
+            document.getElementById('npcMessage').textContent = messages[Math.floor(Math.random() * messages.length)];
+            
+            dialog.classList.add('show');
+            setTimeout(() => {
+                dialog.classList.remove('show');
+            }, 2500);
+        }
+
+        function randomizeBrush() {
+            // Randomize brush settings
+            state.brushSettings.size = 8 + Math.floor(Math.random() * 32);
+            state.brushSettings.opacity = 0.3 + Math.random() * 0.6;
+            state.brushSettings.spacing = 5 + Math.floor(Math.random() * 40);
+            state.brushSettings.jitter = Math.random();
+            
+            // Random color palette
+            const palettes = Object.keys(moodPalettes);
+            state.brushSettings.colorPalette = palettes[Math.floor(Math.random() * palettes.length)];
+            
+            // Random archetype
+            const archetypeKeys = Object.keys(archetypes);
+            const randomArchetype = archetypeKeys[Math.floor(Math.random() * archetypeKeys.length)];
+            setActiveArchetype(randomArchetype);
+            
+            // Update UI
+            updateBrushUI();
+            
+            // Show randomize confirmation
+            showNPCDialog({
+                name: "Randomizer",
+                greeting: "Brush randomized! New possibilities await."
+            });
+        }
+
+        function updateBrushUI() {
+            document.getElementById('sizeSlider').value = state.brushSettings.size;
+            document.getElementById('opacitySlider').value = state.brushSettings.opacity * 100;
+            document.getElementById('spacingSlider').value = state.brushSettings.spacing;
+            document.getElementById('jitterSlider').value = state.brushSettings.jitter * 100;
+            
+            document.getElementById('sizeValue').textContent = state.brushSettings.size;
+            document.getElementById('opacityValue').textContent = Math.round(state.brushSettings.opacity * 100) + '%';
+            document.getElementById('spacingValue').textContent = state.brushSettings.spacing;
+            document.getElementById('jitterValue').textContent = Math.round(state.brushSettings.jitter * 100) + '%';
+        }
+
+        // Redraw entire canvas
+        function redrawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            state.archetypeHistory.forEach(drawPaintEvent);
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('charCount').textContent = state.charactersTyped;
+            
+            // Count unique archetypes used
+            const uniqueArchetypes = new Set(state.archetypeHistory.map(event => event.archetype));
+            document.getElementById('archetypeCount').textContent = uniqueArchetypes.size;
+        }
+
+        // Auto-save canvas
+        function autoSaveCanvas() {
+            const saveData = {
+                archetypeHistory: state.archetypeHistory,
+                charactersTyped: state.charactersTyped,
+                activeArchetype: state.activeArchetype,
+                brushSettings: state.brushSettings,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('fontforgeArchetypes', JSON.stringify(saveData));
+        }
+
+        // Load saved canvas
+        function loadSavedCanvas() {
+            const saved = localStorage.getItem('fontforgeArchetypes');
+            if (saved) {
+                try {
+                    const saveData = JSON.parse(saved);
+                    state.archetypeHistory = saveData.archetypeHistory || [];
+                    state.charactersTyped = saveData.charactersTyped || 0;
+                    state.activeArchetype = saveData.activeArchetype || 'wanderer';
+                    state.brushSettings = saveData.brushSettings || state.brushSettings;
+                    
+                    // Update UI
+                    setActiveArchetype(state.activeArchetype);
+                    updateBrushUI();
+                    
+                    if (state.archetypeHistory.length > 0) {
+                        redrawCanvas();
+                        updateStats();
+                    }
+                } catch (e) {
+                    console.log('No previous canvas found');
+                }
+            }
+        }
+
+        // Save canvas with confirmation
+        function saveCanvas() {
+            autoSaveCanvas();
+            showSaveConfirmation();
+        }
+
+        // Clear canvas
+        function clearCanvas() {
+            if (confirm('Clear the canvas? Your current work will be saved.')) {
+                state.archetypeHistory = [];
+                state.charactersTyped = 0;
+                state.lastPaintPosition = null;
+                document.getElementById('typeInput').value = '';
+                redrawCanvas();
+                updateStats();
+                autoSaveCanvas();
+            }
+        }
+
+        // Show save confirmation
+        function showSaveConfirmation() {
+            const confirmation = document.getElementById('saveConfirmation');
+            confirmation.classList.add('show');
+            setTimeout(() => {
+                confirmation.classList.remove('show');
+            }, 1500);
+        }
+
+        // Initialize everything
+        initializeUI();
+        loadSavedCanvas();
+        updateBrushTexture();
+        
+        // I am the Wanderer, but you may call me what you wish...
+        console.log("I am the Wanderer, guide to these archetypal realms. What mysteries shall we uncover together?");
+    </script>
+</body>
+</html>
