@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FontForge | Minimal Generative Art</title>
+    <title>FontForge | Canvas Exploration</title>
     <style>
         :root {
             --primary-color: #0a0a12;
@@ -60,15 +60,16 @@
             top: 8px;
             left: 8px;
             right: 8px;
-            background: rgba(10, 10, 18, 0.85);
+            background: rgba(10, 10, 18, 0.92);
             padding: 6px 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 50;
             border-radius: 6px;
-            border: 1px solid rgba(78, 205, 196, 0.3);
+            border: 1px solid rgba(78, 205, 196, 0.4);
             font-size: 10px;
+            backdrop-filter: blur(10px);
         }
         
         .app-title {
@@ -111,11 +112,12 @@
             bottom: 8px;
             left: 8px;
             right: 8px;
-            background: rgba(10, 10, 18, 0.9);
+            background: rgba(10, 10, 18, 0.92);
             padding: 6px 8px;
             border-radius: 6px;
             border: 1px solid var(--accent-color);
             z-index: 50;
+            backdrop-filter: blur(10px);
         }
         
         .type-input {
@@ -138,32 +140,71 @@
             position: fixed;
             bottom: 40px;
             right: 8px;
-            background: rgba(10, 10, 18, 0.8);
+            background: rgba(10, 10, 18, 0.85);
             padding: 6px 8px;
             border-radius: 4px;
             border: 1px solid rgba(78, 205, 196, 0.3);
             font-family: var(--font-sample);
             font-size: 9px;
             z-index: 40;
+            backdrop-filter: blur(5px);
         }
         
-        /* Angle control */
-        .angle-control {
+        /* Exploration controls */
+        .exploration-controls {
             position: fixed;
             top: 40px;
             right: 8px;
-            background: rgba(10, 10, 18, 0.8);
-            padding: 6px 8px;
+            background: rgba(10, 10, 18, 0.85);
+            padding: 8px;
             border-radius: 4px;
             border: 1px solid rgba(78, 205, 196, 0.3);
             font-family: var(--font-sample);
             font-size: 9px;
             z-index: 40;
+            backdrop-filter: blur(5px);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 120px;
         }
         
-        .angle-slider {
-            width: 80px;
-            margin: 4px 0;
+        .control-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .control-label {
+            color: var(--accent-color);
+        }
+        
+        .control-value {
+            color: var(--text-color);
+            min-width: 30px;
+            text-align: right;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            margin: 2px 0;
+        }
+        
+        /* Mode descriptions */
+        .mode-hint {
+            position: fixed;
+            top: 40px;
+            left: 8px;
+            background: rgba(10, 10, 18, 0.85);
+            padding: 6px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            font-family: var(--font-sample);
+            font-size: 8px;
+            max-width: 200px;
+            z-index: 40;
+            display: none;
+            backdrop-filter: blur(5px);
         }
         
         /* Save confirmation */
@@ -182,26 +223,11 @@
             opacity: 0;
             transition: opacity 0.3s ease;
             pointer-events: none;
+            backdrop-filter: blur(10px);
         }
         
         .save-confirmation.show {
             opacity: 1;
-        }
-        
-        /* Mode descriptions */
-        .mode-hint {
-            position: fixed;
-            top: 40px;
-            left: 8px;
-            background: rgba(10, 10, 18, 0.8);
-            padding: 6px 8px;
-            border-radius: 4px;
-            border: 1px solid rgba(78, 205, 196, 0.3);
-            font-family: var(--font-sample);
-            font-size: 8px;
-            max-width: 200px;
-            z-index: 40;
-            display: none;
         }
         
         /* Mobile optimizations */
@@ -221,9 +247,13 @@
                 min-width: 0;
             }
             
-            .stats, .angle-control {
+            .stats, .exploration-controls {
                 font-size: 8px;
                 padding: 4px 6px;
+            }
+            
+            .exploration-controls {
+                min-width: 110px;
             }
         }
     </style>
@@ -232,17 +262,18 @@
     <div class="app-container">
         <!-- Minimal Controls -->
         <div class="controls-bar">
-            <div class="app-title">FONTFORGE</div>
+            <div class="app-title">FONTFORGE EXPLORER</div>
             <div class="control-group">
                 <select id="modeSelect">
-                    <option value="spiral">Spiral</option>
-                    <option value="radial">Radial</option>
-                    <option value="wave">Wave</option>
-                    <option value="matrix">Matrix</option>
-                    <option value="freeform">Freeform</option>
+                    <option value="wanderer">Wanderer</option>
+                    <option value="conway">Conway Life</option>
+                    <option value="mountain">Mountain Builder</option>
+                    <option value="river">River Flow</option>
+                    <option value="constellation">Constellation</option>
+                    <option value="weather">Weather System</option>
                 </select>
                 <button id="saveBtn">SAVE</button>
-                <button id="centerBtn">CENTER</button>
+                <button id="exploreBtn">EXPLORE</button>
             </div>
         </div>
         
@@ -253,18 +284,33 @@
         
         <!-- Single Line Input -->
         <div class="input-line">
-            <input type="text" class="type-input" id="typeInput" placeholder="Type to create art... (auto-saves)">
+            <input type="text" class="type-input" id="typeInput" placeholder="Type to explore the canvas... each word creates landscapes...">
         </div>
         
         <!-- Stats -->
         <div class="stats">
-            <span id="charCount">0</span> chars
+            <span id="charCount">0</span> chars • <span id="explorationPercent">0%</span> explored
         </div>
         
-        <!-- Angle Control -->
-        <div class="angle-control">
-            <div>ANGLE: <span id="angleValue">0°</span></div>
-            <input type="range" class="angle-slider" id="angleSlider" min="0" max="360" value="0" step="1">
+        <!-- Exploration Controls -->
+        <div class="exploration-controls">
+            <div class="control-row">
+                <span class="control-label">SPREAD</span>
+                <span class="control-value" id="spreadValue">50</span>
+            </div>
+            <input type="range" id="spreadSlider" min="10" max="200" value="50">
+            
+            <div class="control-row">
+                <span class="control-label">DENSITY</span>
+                <span class="control-value" id="densityValue">3</span>
+            </div>
+            <input type="range" id="densitySlider" min="1" max="10" value="3">
+            
+            <div class="control-row">
+                <span class="control-label">ENERGY</span>
+                <span class="control-value" id="energyValue">75</span>
+            </div>
+            <input type="range" id="energySlider" min="10" max="100" value="75">
         </div>
         
         <!-- Mode Hint -->
@@ -272,7 +318,7 @@
         
         <!-- Save Confirmation -->
         <div class="save-confirmation" id="saveConfirmation">
-            ART SAVED
+            EXPLORATION SAVED
         </div>
     </div>
 
@@ -281,37 +327,51 @@
         const canvas = document.getElementById('artCanvas');
         const ctx = canvas.getContext('2d');
         
-        // Application state
+        // Exploration state
         const state = {
             charactersTyped: 0,
-            renderMode: 'spiral',
-            currentAngle: 0,
-            centerX: 0,
-            centerY: 0,
-            angle: 0,
-            radius: 0,
-            growthFactor: 0.8,
-            colorIndex: 0,
-            artPieces: [],
-            autoSave: true,
-            customCenter: null
+            renderMode: 'wanderer',
+            explorationMap: new Map(), // Tracks explored areas
+            currentPosition: { x: 0, y: 0 },
+            explorationHistory: [],
+            spread: 50,
+            density: 3,
+            energy: 75,
+            colorCycle: 0,
+            mood: 0.5,
+            motivation: 0.5,
+            explorationBounds: {
+                minX: Infinity, maxX: -Infinity,
+                minY: Infinity, maxY: -Infinity
+            }
         };
-        
-        // Color palettes
-        const palettes = {
-            deepOcean: ['#0f3460', '#4ecdc4', '#ff6b6b', '#f7fff7', '#1a1a2e'],
-            sunset: ['#ff9a8b', '#ff6b6b', '#ff8e53', '#ffca3a', '#8ac926'],
-            forest: ['#386641', '#6a994e', '#a7c957', '#f2e8cf', '#bc4749'],
-            neon: ['#ff00ff', '#00ffff', '#ffff00', '#ff0080', '#80ff00']
+
+        // Exploration parameters
+        const explorationParams = {
+            wanderer: { spread: 80, density: 2, energy: 60 },
+            conway: { spread: 30, density: 5, energy: 90 },
+            mountain: { spread: 120, density: 1, energy: 40 },
+            river: { spread: 150, density: 2, energy: 70 },
+            constellation: { spread: 200, density: 1, energy: 30 },
+            weather: { spread: 100, density: 4, energy: 80 }
         };
-        
+
         // Mode descriptions
         const modeHints = {
-            spiral: "Characters spiral outward from center",
-            radial: "Characters arranged in circular patterns", 
-            wave: "Wave-like patterns across the canvas",
-            matrix: "Grid-based character placement",
-            freeform: "Free placement based on typing rhythm"
+            wanderer: "Characters wander freely, exploring unknown territories",
+            conway: "Game of Life rules - characters create living patterns", 
+            mountain: "Builds mountainous terrain with altitude variations",
+            river: "Flowing patterns that carve paths through the landscape",
+            constellation: "Starry patterns connecting distant points",
+            weather: "Dynamic systems with storms, clouds, and clearings"
+        };
+
+        // Color palettes for different moods
+        const moodPalettes = {
+            energetic: ['#ff6b6b', '#ffa726', '#ffee58', '#4ecdc4', '#45b7d1'],
+            calm: ['#8ac6d1', '#bbded6', '#fae3d9', '#ffb6b9', '#61c0bf'],
+            mysterious: ['#6a0572', '#ab83a1', '#c8b6ff', '#b8c0ff', '#bbd0ff'],
+            natural: ['#386641', '#6a994e', '#a7c957', '#f2e8cf', '#bc4749']
         };
 
         // Set canvas to full screen
@@ -319,14 +379,19 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             
-            // Set center - use custom center if set, otherwise screen center
-            if (state.customCenter) {
-                state.centerX = state.customCenter.x;
-                state.centerY = state.customCenter.y;
-            } else {
-                state.centerX = canvas.width / 2;
-                state.centerY = canvas.height / 2;
-            }
+            // Initialize exploration from center
+            state.currentPosition = {
+                x: canvas.width / 2,
+                y: canvas.height / 2
+            };
+            
+            // Reset exploration bounds
+            state.explorationBounds = {
+                minX: state.currentPosition.x,
+                maxX: state.currentPosition.x,
+                minY: state.currentPosition.y,
+                maxY: state.currentPosition.y
+            };
             
             redrawCanvas();
         }
@@ -341,21 +406,13 @@
             modeSelect.value = state.renderMode;
             modeSelect.addEventListener('change', (e) => {
                 state.renderMode = e.target.value;
+                updateExplorationParams();
                 showModeHint();
-                // Don't clear canvas - keep existing art
                 updateModeHint();
             });
 
-            // Angle slider
-            const angleSlider = document.getElementById('angleSlider');
-            const angleValue = document.getElementById('angleValue');
-            
-            angleSlider.addEventListener('input', (e) => {
-                state.currentAngle = parseInt(e.target.value);
-                angleValue.textContent = state.currentAngle + '°';
-                // Apply angle to new characters without clearing
-                redrawCanvas();
-            });
+            // Exploration sliders
+            initializeSliders();
 
             // Typing input
             const typeInput = document.getElementById('typeInput');
@@ -365,15 +422,10 @@
             setTimeout(() => typeInput.focus(), 500);
 
             // Save button
-            document.getElementById('saveBtn').addEventListener('click', saveArt);
+            document.getElementById('saveBtn').addEventListener('click', saveExploration);
 
-            // Center button - set new center point
-            document.getElementById('centerBtn').addEventListener('click', setNewCenter);
-
-            // Click on canvas to set new center
-            canvas.addEventListener('click', (e) => {
-                setCenterFromClick(e);
-            });
+            // Explore button - auto-explore
+            document.getElementById('exploreBtn').addEventListener('click', autoExplore);
 
             // Show mode hint on hover
             modeSelect.addEventListener('mouseenter', showModeHint);
@@ -384,189 +436,372 @@
             modeSelect.addEventListener('touchend', () => {
                 setTimeout(hideModeHint, 2000);
             });
+
+            // Initial exploration
+            addInitialExploration();
         }
 
-        // Set new center from click
-        function setNewCenter() {
-            state.customCenter = null; // Reset to auto-center on next click
-            alert('Click anywhere on canvas to set new center point');
+        function initializeSliders() {
+            // Spread slider
+            const spreadSlider = document.getElementById('spreadSlider');
+            const spreadValue = document.getElementById('spreadValue');
+            spreadSlider.value = state.spread;
+            spreadValue.textContent = state.spread;
+            spreadSlider.addEventListener('input', (e) => {
+                state.spread = parseInt(e.target.value);
+                spreadValue.textContent = state.spread;
+            });
+
+            // Density slider
+            const densitySlider = document.getElementById('densitySlider');
+            const densityValue = document.getElementById('densityValue');
+            densitySlider.value = state.density;
+            densityValue.textContent = state.density;
+            densitySlider.addEventListener('input', (e) => {
+                state.density = parseInt(e.target.value);
+                densityValue.textContent = state.density;
+            });
+
+            // Energy slider
+            const energySlider = document.getElementById('energySlider');
+            const energyValue = document.getElementById('energyValue');
+            energySlider.value = state.energy;
+            energyValue.textContent = state.energy;
+            energySlider.addEventListener('input', (e) => {
+                state.energy = parseInt(e.target.value);
+                energyValue.textContent = state.energy;
+            });
         }
 
-        function setCenterFromClick(e) {
-            const rect = canvas.getBoundingClientRect();
-            state.customCenter = {
-                x: e.clientX - rect.left,
-                y: e.clientY - rect.top
-            };
-            resizeCanvas(); // This will update the center
+        function updateExplorationParams() {
+            const params = explorationParams[state.renderMode];
+            if (params) {
+                state.spread = params.spread;
+                state.density = params.density;
+                state.energy = params.energy;
+                
+                // Update sliders
+                document.getElementById('spreadSlider').value = state.spread;
+                document.getElementById('densitySlider').value = state.density;
+                document.getElementById('energySlider').value = state.energy;
+                document.getElementById('spreadValue').textContent = state.spread;
+                document.getElementById('densityValue').textContent = state.density;
+                document.getElementById('energyValue').textContent = state.energy;
+            }
         }
 
-        // Handle typing input
+        // Handle typing input - each character explores new territory
         function handleTyping(e) {
             const newText = e.target.value;
             const newChars = newText.length - state.charactersTyped;
             
             if (newChars > 0) {
                 for (let i = 0; i < newChars; i++) {
-                    addCharacterToArt(newText[state.charactersTyped + i]);
+                    const char = newText[state.charactersTyped + i];
+                    exploreWithCharacter(char);
                 }
                 state.charactersTyped = newText.length;
                 updateStats();
                 
                 // Auto-save
-                if (state.autoSave) {
-                    autoSaveArt();
-                }
+                autoSaveExploration();
             }
         }
 
-        // Add character to art
-        function addCharacterToArt(char) {
-            const artPiece = {
+        // Explore canvas with a character
+        function exploreWithCharacter(char) {
+            const exploration = {
                 char: char,
                 mode: state.renderMode,
                 timestamp: Date.now(),
-                position: {
-                    x: state.centerX,
-                    y: state.centerY,
-                    angle: state.angle,
-                    radius: state.radius,
-                    globalAngle: state.currentAngle
-                }
+                position: { ...state.currentPosition },
+                energy: state.energy / 100,
+                mood: state.mood,
+                motivation: state.motivation
             };
             
-            state.artPieces.push(artPiece);
-            drawArtPiece(artPiece);
+            // Add to history
+            state.explorationHistory.push(exploration);
             
-            // Update state for next character
-            state.angle += 0.15;
-            state.radius += state.growthFactor;
+            // Mark area as explored
+            const gridX = Math.floor(exploration.position.x / 10);
+            const gridY = Math.floor(exploration.position.y / 10);
+            const key = `${gridX},${gridY}`;
+            state.explorationMap.set(key, true);
             
-            // Reset radius if it gets too large
-            const maxRadius = Math.min(canvas.width, canvas.height) * 0.8;
-            if (state.radius > maxRadius) {
-                state.radius = 0;
-                state.colorIndex = (state.colorIndex + 1) % palettes.deepOcean.length;
+            // Update exploration bounds
+            state.explorationBounds.minX = Math.min(state.explorationBounds.minX, exploration.position.x);
+            state.explorationBounds.maxX = Math.max(state.explorationBounds.maxX, exploration.position.x);
+            state.explorationBounds.minY = Math.min(state.explorationBounds.minY, exploration.position.y);
+            state.explorationBounds.maxY = Math.max(state.explorationBounds.maxY, exploration.position.y);
+            
+            // Draw the exploration
+            drawExploration(exploration);
+            
+            // Move to next position based on mode and character
+            moveExplorer(char);
+            
+            // Update mood and motivation based on exploration
+            updatePsychologicalState(char);
+        }
+
+        // Move explorer to new position
+        function moveExplorer(char) {
+            const charCode = char.charCodeAt(0);
+            const angle = (charCode * 137.5) % 360; // Golden angle distribution
+            const distance = (state.spread / 100) * 50 + (charCode % 20);
+            
+            let newX = state.currentPosition.x + Math.cos(angle * Math.PI / 180) * distance;
+            let newY = state.currentPosition.y + Math.sin(angle * Math.PI / 180) * distance;
+            
+            // Apply mode-specific behavior
+            switch(state.renderMode) {
+                case 'conway':
+                    // Conway-like movement - prefer unexplored areas
+                    if (Math.random() > 0.7) {
+                        newX += (Math.random() - 0.5) * state.spread;
+                        newY += (Math.random() - 0.5) * state.spread;
+                    }
+                    break;
+                case 'mountain':
+                    // Mountain building - tend upward
+                    newY -= (state.energy / 100) * 20;
+                    break;
+                case 'river':
+                    // River flow - horizontal tendency
+                    newX += (state.energy / 100) * 30;
+                    break;
+                case 'constellation':
+                    // Constellation - large jumps
+                    if (charCode % 5 === 0) {
+                        newX = Math.random() * canvas.width;
+                        newY = Math.random() * canvas.height;
+                    }
+                    break;
+                case 'weather':
+                    // Weather patterns - chaotic movement
+                    newX += (Math.random() - 0.5) * state.spread * 2;
+                    newY += (Math.random() - 0.5) * state.spread;
+                    break;
+            }
+            
+            // Keep within reasonable bounds with wrap-around
+            newX = (newX + canvas.width) % canvas.width;
+            newY = (newY + canvas.height) % canvas.height;
+            
+            state.currentPosition.x = newX;
+            state.currentPosition.y = newY;
+        }
+
+        // Update psychological state based on character and exploration
+        function updatePsychologicalState(char) {
+            const charCode = char.charCodeAt(0);
+            
+            // Mood changes based on vowel/consonant and position
+            if ('aeiouAEIOU'.includes(char)) {
+                state.mood = Math.min(1, state.mood + 0.02);
+            } else {
+                state.mood = Math.max(0, state.mood - 0.01);
+            }
+            
+            // Motivation based on exploration progress
+            const exploredArea = calculateExploredArea();
+            state.motivation = exploredArea / 100;
+            
+            // Add some randomness
+            state.mood += (Math.random() - 0.5) * 0.05;
+            state.motivation += (Math.random() - 0.5) * 0.03;
+            
+            // Clamp values
+            state.mood = Math.max(0, Math.min(1, state.mood));
+            state.motivation = Math.max(0, Math.min(1, state.motivation));
+        }
+
+        // Draw a single exploration
+        function drawExploration(exploration) {
+            const colors = getMoodPalette();
+            const baseSize = 8 + (state.energy / 100) * 16;
+            
+            switch(exploration.mode) {
+                case 'wanderer':
+                    drawWanderer(exploration, colors, baseSize);
+                    break;
+                case 'conway':
+                    drawConway(exploration, colors, baseSize);
+                    break;
+                case 'mountain':
+                    drawMountain(exploration, colors, baseSize);
+                    break;
+                case 'river':
+                    drawRiver(exploration, colors, baseSize);
+                    break;
+                case 'constellation':
+                    drawConstellation(exploration, colors, baseSize);
+                    break;
+                case 'weather':
+                    drawWeather(exploration, colors, baseSize);
+                    break;
             }
         }
 
-        // Draw a single art piece with rotation
-        function drawArtPiece(artPiece) {
-            const colors = palettes.deepOcean;
+        // Drawing functions for different exploration modes
+        function drawWanderer(exploration, colors, baseSize) {
+            const size = baseSize * (0.8 + exploration.mood * 0.4);
+            const color = colors[Math.floor(exploration.mood * (colors.length - 1))];
+            const opacity = 0.7 + exploration.motivation * 0.3;
             
-            // Save context for rotation
-            ctx.save();
+            ctx.globalAlpha = opacity;
+            ctx.font = `bold ${size}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
+            ctx.fillStyle = color;
+            ctx.fillText(exploration.char, exploration.position.x, exploration.position.y);
+            ctx.globalAlpha = 1;
+        }
+
+        function drawConway(exploration, colors, baseSize) {
+            const neighbors = countNeighbors(exploration.position);
+            const size = baseSize * (0.5 + neighbors * 0.3);
+            const color = colors[neighbors % colors.length];
             
-            // Apply global rotation if not zero
-            if (artPiece.position.globalAngle !== 0) {
-                ctx.translate(artPiece.position.x, artPiece.position.y);
-                ctx.rotate(artPiece.position.globalAngle * Math.PI / 180);
-                ctx.translate(-artPiece.position.x, -artPiece.position.y);
+            ctx.font = `bold ${size}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
+            ctx.fillStyle = color;
+            ctx.fillText(exploration.char, exploration.position.x, exploration.position.y);
+            
+            // Draw connections to neighbors
+            if (neighbors > 1) {
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1;
+                drawConnections(exploration.position);
             }
+        }
+
+        function drawMountain(exploration, colors, baseSize) {
+            const altitude = 1 - (exploration.position.y / canvas.height);
+            const size = baseSize * (0.3 + altitude * 0.7);
+            const colorIndex = Math.floor(altitude * (colors.length - 1));
+            const color = colors[colorIndex];
             
-            switch(artPiece.mode) {
-                case 'spiral':
-                    drawSpiral(artPiece.char, artPiece.position, colors);
-                    break;
-                case 'radial':
-                    drawRadial(artPiece.char, artPiece.position, colors);
-                    break;
-                case 'wave':
-                    drawWave(artPiece.char, artPiece.position, colors);
-                    break;
-                case 'matrix':
-                    drawMatrix(artPiece.char, artPiece.position, colors);
-                    break;
-                case 'freeform':
-                    drawFreeform(artPiece.char, artPiece.position, colors);
-                    break;
+            ctx.font = `bold ${size}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
+            ctx.fillStyle = color;
+            ctx.fillText(exploration.char, exploration.position.x, exploration.position.y);
+        }
+
+        function drawRiver(exploration, colors, baseSize) {
+            const flow = exploration.position.x / canvas.width;
+            const size = baseSize * (0.4 + Math.sin(flow * Math.PI * 2) * 0.3);
+            const color = colors[Math.floor(flow * (colors.length - 1))];
+            
+            ctx.font = `bold ${size}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
+            ctx.fillStyle = color;
+            ctx.fillText(exploration.char, exploration.position.x, exploration.position.y);
+            
+            // Draw flow lines
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.3;
+            ctx.beginPath();
+            ctx.moveTo(exploration.position.x - 20, exploration.position.y);
+            ctx.lineTo(exploration.position.x + 20, exploration.position.y);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+        }
+
+        function drawConstellation(exploration, colors, baseSize) {
+            const brightness = exploration.motivation;
+            const size = baseSize * (0.2 + brightness * 0.8);
+            const color = colors[Math.floor(brightness * (colors.length - 1))];
+            
+            ctx.font = `bold ${size}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
+            ctx.fillStyle = color;
+            ctx.fillText('•', exploration.position.x, exploration.position.y);
+            
+            // Draw constellation lines
+            if (state.explorationHistory.length > 1) {
+                const prev = state.explorationHistory[state.explorationHistory.length - 2];
+                const distance = Math.sqrt(
+                    Math.pow(exploration.position.x - prev.position.x, 2) +
+                    Math.pow(exploration.position.y - prev.position.y, 2)
+                );
+                
+                if (distance < 200) {
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 0.5;
+                    ctx.globalAlpha = 0.5;
+                    ctx.beginPath();
+                    ctx.moveTo(prev.position.x, prev.position.y);
+                    ctx.lineTo(exploration.position.x, exploration.position.y);
+                    ctx.stroke();
+                    ctx.globalAlpha = 1;
+                }
             }
-            
-            // Restore context
-            ctx.restore();
         }
 
-        // Drawing functions
-        function drawSpiral(char, position, colors) {
-            const x = position.x + Math.cos(position.angle) * position.radius;
-            const y = position.y + Math.sin(position.angle) * position.radius;
+        function drawWeather(exploration, colors, baseSize) {
+            const turbulence = exploration.mood;
+            const size = baseSize * (0.5 + turbulence * 0.5);
+            const color = colors[Math.floor(turbulence * (colors.length - 1))];
+            const char = turbulence > 0.7 ? '⚡' : turbulence > 0.4 ? '☁️' : '○';
             
-            const fontSize = Math.max(10, 12 + (position.radius / 25));
-            const color = colors[Math.floor(position.angle * 10) % colors.length];
-            
-            ctx.font = `bold ${fontSize}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
+            ctx.font = `bold ${size}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
             ctx.fillStyle = color;
-            ctx.fillText(char, x, y);
+            ctx.fillText(char, exploration.position.x, exploration.position.y);
         }
 
-        function drawRadial(char, position, colors) {
-            const segmentAngle = (2 * Math.PI) / 24;
-            const currentAngle = (state.artPieces.length % 24) * segmentAngle;
-            const radius = 30 + Math.floor(state.artPieces.length / 24) * 15;
-            
-            const x = position.x + Math.cos(currentAngle) * radius;
-            const y = position.y + Math.sin(currentAngle) * radius;
-            
-            const fontSize = 14;
-            const color = colors[state.artPieces.length % colors.length];
-            
-            ctx.font = `bold ${fontSize}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
-            ctx.fillStyle = color;
-            ctx.fillText(char, x, y);
+        // Helper functions
+        function countNeighbors(position) {
+            let count = 0;
+            for (let dx = -1; dx <= 1; dx++) {
+                for (let dy = -1; dy <= 1; dy++) {
+                    if (dx === 0 && dy === 0) continue;
+                    const gridX = Math.floor((position.x + dx * 20) / 10);
+                    const gridY = Math.floor((position.y + dy * 20) / 10);
+                    const key = `${gridX},${gridY}`;
+                    if (state.explorationMap.has(key)) count++;
+                }
+            }
+            return count;
         }
 
-        function drawWave(char, position, colors) {
-            const waveIndex = Math.floor(state.artPieces.length / 30);
-            const y = position.y + Math.sin(position.angle * 2) * 40;
-            const x = position.x + (state.artPieces.length % 30) * 20 - 300;
-            
-            const fontSize = 16;
-            const color = colors[waveIndex % colors.length];
-            
-            ctx.font = `bold ${fontSize}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
-            ctx.fillStyle = color;
-            ctx.fillText(char, x, y);
+        function drawConnections(position) {
+            for (let dx = -1; dx <= 1; dx++) {
+                for (let dy = -1; dy <= 1; dy++) {
+                    if (dx === 0 && dy === 0) continue;
+                    const gridX = Math.floor((position.x + dx * 20) / 10);
+                    const gridY = Math.floor((position.y + dy * 20) / 10);
+                    const key = `${gridX},${gridY}`;
+                    if (state.explorationMap.has(key)) {
+                        ctx.beginPath();
+                        ctx.moveTo(position.x, position.y);
+                        ctx.lineTo(position.x + dx * 20, position.y + dy * 20);
+                        ctx.stroke();
+                    }
+                }
+            }
         }
 
-        function drawMatrix(char, position, colors) {
-            const cols = Math.floor(canvas.width / 30);
-            const row = Math.floor(state.artPieces.length / cols);
-            const col = state.artPieces.length % cols;
-            
-            const x = col * 30 + (Math.random() * 10 - 5);
-            const y = row * 25 + (Math.random() * 10 - 5);
-            
-            const fontSize = 12 + Math.random() * 6;
-            const color = colors[col % colors.length];
-            
-            ctx.font = `bold ${fontSize}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
-            ctx.fillStyle = color;
-            ctx.fillText(char, x, y);
+        function getMoodPalette() {
+            if (state.mood > 0.7) return moodPalettes.energetic;
+            if (state.mood > 0.4) return moodPalettes.calm;
+            if (state.motivation > 0.6) return moodPalettes.mysterious;
+            return moodPalettes.natural;
         }
 
-        function drawFreeform(char, position, colors) {
-            // Freeform uses typing rhythm for placement
-            const timeVar = (Date.now() % 1000) / 1000;
-            const x = position.x + Math.cos(timeVar * Math.PI * 2) * (50 + position.radius);
-            const y = position.y + Math.sin(timeVar * Math.PI * 2) * (50 + position.radius);
-            
-            const fontSize = 14 + Math.random() * 8;
-            const color = colors[Math.floor(timeVar * colors.length)];
-            
-            ctx.font = `bold ${fontSize}px ${getComputedStyle(document.documentElement).getPropertyValue('--font-sample')}`;
-            ctx.fillStyle = color;
-            ctx.fillText(char, x, y);
+        function calculateExploredArea() {
+            const gridCells = state.explorationMap.size;
+            const totalGridCells = Math.floor(canvas.width / 10) * Math.floor(canvas.height / 10);
+            return Math.min(100, (gridCells / totalGridCells) * 100);
         }
 
         // Redraw entire canvas
         function redrawCanvas() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            state.artPieces.forEach(drawArtPiece);
+            state.explorationHistory.forEach(drawExploration);
         }
 
         // Update statistics
         function updateStats() {
             document.getElementById('charCount').textContent = state.charactersTyped;
+            const exploredPercent = calculateExploredArea();
+            document.getElementById('explorationPercent').textContent = exploredPercent.toFixed(1) + '%';
         }
 
         // Show mode hint
@@ -585,49 +820,89 @@
             hint.textContent = modeHints[state.renderMode] || "";
         }
 
-        // Auto-save art
-        function autoSaveArt() {
-            const saveData = {
-                artPieces: state.artPieces,
-                charactersTyped: state.charactersTyped,
-                customCenter: state.customCenter,
-                renderMode: state.renderMode,
-                currentAngle: state.currentAngle,
-                timestamp: Date.now()
-            };
-            localStorage.setItem('fontforgeArt', JSON.stringify(saveData));
+        // Auto-explore function
+        function autoExplore() {
+            const sampleText = "explore discover create imagine wander journey adventure mystery wonder beauty chaos order pattern rhythm flow energy life universe cosmos infinite possibilities ";
+            let i = 0;
+            
+            const exploreInterval = setInterval(() => {
+                if (i < sampleText.length) {
+                    exploreWithCharacter(sampleText[i]);
+                    i++;
+                    updateStats();
+                } else {
+                    clearInterval(exploreInterval);
+                }
+            }, 50);
         }
 
-        // Load saved art
-        function loadSavedArt() {
-            const saved = localStorage.getItem('fontforgeArt');
+        // Add initial exploration
+        function addInitialExploration() {
+            exploreWithCharacter('●');
+        }
+
+        // Auto-save exploration
+        function autoSaveExploration() {
+            const saveData = {
+                explorationHistory: state.explorationHistory,
+                charactersTyped: state.charactersTyped,
+                renderMode: state.renderMode,
+                spread: state.spread,
+                density: state.density,
+                energy: state.energy,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('fontforgeExploration', JSON.stringify(saveData));
+        }
+
+        // Load saved exploration
+        function loadSavedExploration() {
+            const saved = localStorage.getItem('fontforgeExploration');
             if (saved) {
                 try {
                     const saveData = JSON.parse(saved);
-                    state.artPieces = saveData.artPieces || [];
+                    state.explorationHistory = saveData.explorationHistory || [];
                     state.charactersTyped = saveData.charactersTyped || 0;
-                    state.customCenter = saveData.customCenter || null;
-                    state.renderMode = saveData.renderMode || 'spiral';
-                    state.currentAngle = saveData.currentAngle || 0;
+                    state.renderMode = saveData.renderMode || 'wanderer';
+                    state.spread = saveData.spread || 50;
+                    state.density = saveData.density || 3;
+                    state.energy = saveData.energy || 75;
+                    
+                    // Rebuild exploration map
+                    state.explorationMap.clear();
+                    state.explorationHistory.forEach(exp => {
+                        const gridX = Math.floor(exp.position.x / 10);
+                        const gridY = Math.floor(exp.position.y / 10);
+                        const key = `${gridX},${gridY}`;
+                        state.explorationMap.set(key, true);
+                    });
                     
                     // Update UI
                     document.getElementById('modeSelect').value = state.renderMode;
-                    document.getElementById('angleSlider').value = state.currentAngle;
-                    document.getElementById('angleValue').textContent = state.currentAngle + '°';
+                    document.getElementById('spreadSlider').value = state.spread;
+                    document.getElementById('densitySlider').value = state.density;
+                    document.getElementById('energySlider').value = state.energy;
+                    document.getElementById('spreadValue').textContent = state.spread;
+                    document.getElementById('densityValue').textContent = state.density;
+                    document.getElementById('energyValue').textContent = state.energy;
                     
-                    if (state.artPieces.length > 0) {
+                    if (state.explorationHistory.length > 0) {
+                        // Set current position to last exploration
+                        const lastExp = state.explorationHistory[state.explorationHistory.length - 1];
+                        state.currentPosition = { ...lastExp.position };
+                        
                         redrawCanvas();
                         updateStats();
                     }
                 } catch (e) {
-                    console.log('No previous art found');
+                    console.log('No previous exploration found');
                 }
             }
         }
 
-        // Save art with confirmation
-        function saveArt() {
-            autoSaveArt();
+        // Save exploration with confirmation
+        function saveExploration() {
+            autoSaveExploration();
             showSaveConfirmation();
         }
 
@@ -642,8 +917,9 @@
 
         // Initialize everything
         initializeUI();
-        loadSavedArt();
+        loadSavedExploration();
         updateModeHint();
+        updateExplorationParams();
     </script>
 </body>
 </html>
