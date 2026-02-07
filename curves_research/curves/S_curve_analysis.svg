@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="871.0" height="1128.0" viewBox="0 0 871.0 1128.0"
+     xmlns="http://www.w3.org/2000/svg">
+    
+    <defs>
+        <style>
+            /* Base styles */
+            .glyph-outline { fill: none; stroke: #333; stroke-width: 2; opacity: 0.7; }
+            
+            /* Grid styles */
+            .grid-line { stroke: #e0e0ff; stroke-width: 0.5; opacity: 0.5; }
+            .grid-line-major { stroke: #c0c0ff; stroke-width: 0.8; opacity: 0.7; }
+            .grid-coord { font-family: Arial; font-size: 8px; fill: #666; opacity: 0.7; }
+            
+            /* Arc analysis styles */
+            .circular-arc-guide { fill: none; stroke: #ff5500; stroke-width: 1.5; stroke-dasharray: 5,3; opacity: 0.8; }
+            .arc-center { fill: #ff5500; stroke: none; r: 3; opacity: 0.9; }
+            .radius-line { stroke: #ff5500; stroke-width: 1; stroke-dasharray: 2,2; opacity: 0.6; }
+            .arc-label { font-family: Arial; font-size: 9px; fill: #ff5500; font-weight: bold; }
+            
+            /* Bezier segment styles */
+            .bezier-segment { fill: none; stroke: #00aa00; stroke-width: 1.2; opacity: 0.8; }
+            .control-point-on { fill: #ff0000; stroke: none; r: 2.5; }
+            .control-point-off { fill: #0000ff; stroke: none; r: 2; }
+            .control-line { stroke: #ff66aa; stroke-width: 0.8; stroke-dasharray: 2,2; opacity: 0.6; }
+            
+            /* Information styles */
+            .info-box { fill: white; stroke: #ccc; stroke-width: 1; opacity: 0.9; }
+            .info-text { font-family: Arial; font-size: 10px; fill: #333; }
+            .info-title { font-family: Arial; font-size: 11px; fill: #333; font-weight: bold; }
+            
+            /* Legend styles */
+            .legend-item { font-family: Arial; font-size: 9px; fill: #333; }
+        </style>
+        
+        <!-- Arrow marker for angle indication -->
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#ff5500"/>
+        </marker>
+    </defs>
+    
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="white"/>
+    
+    <g transform="translate(211.5, 211.5)">
+    
+    <!-- OPTIMAL CONSTRUCTION GRID -->
+    <g id="construction-grid">
+        <line x1="20" y1="-20" x2="20" y2="780" class="grid-line-major"/>
+        <text x="20" y="792" class="grid-coord" text-anchor="middle">20</text>
+        <line x1="70" y1="-20" x2="70" y2="780" class="grid-line"/>
+        <line x1="120" y1="-20" x2="120" y2="780" class="grid-line"/>
+        <line x1="170" y1="-20" x2="170" y2="780" class="grid-line"/>
+        <line x1="220" y1="-20" x2="220" y2="780" class="grid-line"/>
+        <line x1="270" y1="-20" x2="270" y2="780" class="grid-line-major"/>
+        <text x="270" y="792" class="grid-coord" text-anchor="middle">270</text>
+        <line x1="320" y1="-20" x2="320" y2="780" class="grid-line"/>
+        <line x1="370" y1="-20" x2="370" y2="780" class="grid-line"/>
+        <line x1="420" y1="-20" x2="420" y2="780" class="grid-line"/>
+        <line x1="470" y1="-20" x2="470" y2="780" class="grid-line"/>
+        <line x1="520" y1="-20" x2="520" y2="780" class="grid-line-major"/>
+        <text x="520" y="792" class="grid-coord" text-anchor="middle">520</text>
+        <line x1="20" y1="-20" x2="520" y2="-20" class="grid-line"/>
+        <line x1="20" y1="80" x2="520" y2="80" class="grid-line-major"/>
+        <text x="12" y="83" class="grid-coord" text-anchor="end">80</text>
+        <line x1="20" y1="180" x2="520" y2="180" class="grid-line"/>
+        <line x1="20" y1="280" x2="520" y2="280" class="grid-line"/>
+        <line x1="20" y1="380" x2="520" y2="380" class="grid-line"/>
+        <line x1="20" y1="480" x2="520" y2="480" class="grid-line"/>
+        <line x1="20" y1="580" x2="520" y2="580" class="grid-line-major"/>
+        <text x="12" y="583" class="grid-coord" text-anchor="end">580</text>
+        <line x1="20" y1="680" x2="520" y2="680" class="grid-line"/>
+        <line x1="20" y1="780" x2="520" y2="780" class="grid-line"/>
+    </g>
+    
+    <!-- GLYPH OUTLINE (faded background) -->
+    <path d="M431 296h-16q-19 -96 -56 -130q-32 -29 -85 -29q-49 0 -83 30.5t-34 79.5q0 71 81 127q76 48 152 95q82 62 82 147q0 90 -78 146q-70 50 -165 50q-97 0 -176 -51l-29 -170h18q21 79 69 131q56 60 133 60q58 0 95 -32t37 -90q0 -73 -79 -128q-74 -45 -147 -90
+q-80 -60 -80 -144q0 -83 71 -139q66 -52 152 -52q39 0 74 9.5t72 29.5z" class="glyph-outline"/>
+    
+    <!-- BEZIER SEGMENT ANALYSIS -->
+    <g id="bezier-analysis">
+    </g>
+    
+    <!-- CIRCULAR ARC ANALYSIS -->
+    <g id="circular-arcs">
+    </g>
+    
+    <!-- GRID ALIGNMENT MARKS -->
+    <g id="grid-alignment">
+        <!-- bbox-corner at (24,-12) -->
+        <line x1="18.0" y1="-12.0" x2="30.0" y2="-12.0" stroke="#00aa00" stroke-width="1"/>
+        <line x1="24.0" y1="-18.0" x2="24.0" y2="-6.0" stroke="#00aa00" stroke-width="1"/>
+        <!-- bbox-corner at (472,-12) -->
+        <line x1="466.0" y1="-12.0" x2="478.0" y2="-12.0" stroke="#00aa00" stroke-width="1"/>
+        <line x1="472.0" y1="-18.0" x2="472.0" y2="-6.0" stroke="#00aa00" stroke-width="1"/>
+        <!-- bbox-corner at (24,693) -->
+        <line x1="18.0" y1="693.0" x2="30.0" y2="693.0" stroke="#00aa00" stroke-width="1"/>
+        <line x1="24.0" y1="687.0" x2="24.0" y2="699.0" stroke="#00aa00" stroke-width="1"/>
+        <!-- bbox-corner at (472,693) -->
+        <line x1="466.0" y1="693.0" x2="478.0" y2="693.0" stroke="#00aa00" stroke-width="1"/>
+        <line x1="472.0" y1="687.0" x2="472.0" y2="699.0" stroke="#00aa00" stroke-width="1"/>
+    </g>
+    
+    </g> <!-- End of main transform group -->
+    
+    <!-- ANALYSIS SUMMARY BOX -->
+    <g transform="translate(20, 30)">
+        <rect width="280" height="160" class="info-box" rx="5"/>
+        <text x="10" y="25" class="info-title">{glyph_name} Curve Analysis</text>
+        
+        <text x="15" y="45" class="info-text">Total Bezier segments: {len(segments)}</text>
+        <text x="15" y="60" class="info-text">Circular arcs detected: {len([a for a in arcs if a.get("is_circular_arc", False)])}</text>
+        <text x="15" y="75" class="info-text">Optimal grid: {optimal_grid["grid_x"]}×{optimal_grid["grid_y"]} units</text>
+        <text x="15" y="90" class="info-text">Grid offset: ({optimal_grid["offset_x"]},{optimal_grid["offset_y"]})</text>
+        <text x="15" y="105" class="info-text">Grid alignment: {optimal_grid["score"]}/{optimal_grid["max_possible"]} points</text>
+        <text x="15" y="120" class="info-text">Bounding box: [{left:.0f}, {bottom:.0f}, {right:.0f}, {top:.0f}]</text>
+        <text x="15" y="135" class="info-text">Dimensions: {width:.0f} × {height:.0f} units</text>
+        
+        <!-- Common radii -->
+    </g>
+    
+    <!-- LEGEND -->
+    <g transform="translate({svg_width - 180}, 30)">
+        <rect width="160" height="150" class="info-box" rx="5"/>
+        <text x="10" y="25" class="info-title">Legend</text>
+        
+        <line x1="15" x2="25" y1="40" y2="40" stroke="#e0e0ff" stroke-width="1"/>
+        <text x="30" y="43" class="legend-item">Construction grid</text>
+        
+        <line x1="15" x2="25" y1="55" y2="55" stroke="#ff5500" stroke-dasharray="5,3" stroke-width="1.5"/>
+        <text x="30" y="58" class="legend-item">Circular arc guide</text>
+        
+        <circle cx="20" cy="70" r="3" fill="#ff5500"/>
+        <text x="30" y="73" class="legend-item">Arc center</text>
+        
+        <line x1="15" x2="25" y1="85" y2="85" stroke="#00aa00" stroke-width="1.2"/>
+        <text x="30" y="88" class="legend-item">Bezier segment</text>
+        
+        <circle cx="20" cy="100" r="2.5" fill="#ff0000"/>
+        <text x="30" y="103" class="legend-item">On-curve point</text>
+        
+        <circle cx="20" cy="115" r="2" fill="#0000ff"/>
+        <text x="30" y="118" class="legend-item">Off-curve point</text>
+        
+        <line x1="15" x2="25" y1="130" y2="130" stroke="#00aa00" stroke-width="1"/>
+        <text x="30" y="133" class="legend-item">Grid alignment</text>
+    </g>
+    
+    <!-- TITLE -->
+    <text x="{svg_width/2}" y="20" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle">
+        Mathematical Curve Analysis: {glyph_name}
+    </text>
+    
+</svg>
